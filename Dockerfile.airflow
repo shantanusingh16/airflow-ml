@@ -1,0 +1,19 @@
+# Airflow 3.3.1 with the providers this stack needs:
+#   * docker  -> DockerOperator (launches job-runner containers)
+#   * amazon  -> S3Hook & friends (MinIO / S3 artifact storage)
+#
+# Pin ranges keep you on the same provider minor lines that were verified
+# against Airflow 3.3.1 (docker 4.5.x, amazon 9.9.x).
+#
+# The base image's default USER is the airflow user (50000), but its python
+# (/usr/python) is root-owned, so the install below runs as root; the
+# installed files are world-readable for the airflow user at runtime.
+FROM apache/airflow:3.3.1
+
+USER root
+
+RUN uv pip install --system \
+    "apache-airflow-providers-docker>=4.5.9,<5" \
+    "apache-airflow-providers-amazon>=9.9.0,<10"
+
+RUN chmod -R a+rX /opt/airflow

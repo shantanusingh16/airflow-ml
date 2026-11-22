@@ -1,0 +1,82 @@
+# Reference KubeRay manifest: run ml-jobrunner jobs on a k8s-managed Ray cluster.
+#
+# The job-runner image is orchestrator-agnostic by design:
+#   - it has NO ENTRYPOINT, so KubeRay/Docker supply any container command
+#     (or plain `python job.py`);
+#   - it pins ray 2.58.0 as `ray[default]` (adds the dashboard deps so
+#     `ray job submit` works; the version must match on every node);
+#   - `ray start` is a launcher: it exits once the GCS/raylet daemons are up,
+#     so with no ENTRYPOINT the container command itself must keep the
+#     process alive (`... && sleep infinity`). The commands below do that; if
+#     your KubeRay version generates/overrides its own `ray start` command,
+#     base the image on the official rayproject/ray entrypoint instead (it
+#     performs the same keepalive).
+#   - job scripts are env-driven and use no docker-specific APIs, so they run
+#     unchanged as Ray workloads (submit via `ray job submit`, or have the job
+#     call ray.init(address="auto") to use cluster resources).
+#
+# Prerequisites on the target cluster:
+#   1. KubeRay operator installed (v1.7.0 is the current release as of 2026-08;
+#      confirm operator<->ray compatibility in the KubeRay docs when deploying).
+#   2. The job-runner image pushed to a registry the cluster can pull.
+#      The local `ml-jobrunner:latest` tag is NOT resolvable from k8s:
+#        docker tag ml-jobrunner:latest <registry>/ml-jobrunner:latest
+#        docker push <registry>/ml-jobrunner:latest
+#      and use that tag below.
+#
+# Submitting a job once the head service exists:
+#   ray job submit --address http://ml-jobs-head-svc.<ns>.svc:8265 \
+#     --runtime-env-json '{"env_vars": {"RUN_ID": "manual", "S3_ENDPOINT": "http://<s3-endpoint>",
+#        "S3_BUCKET": "ml-artifacts", "S3_ACCESS_KEY": "...", "S3_SECRET_KEY": "...",
+#        "MLFLOW_TRACKING_URI": "http://<mlflow-svc>:5000", "QDRANT_URL": "http://<qdrant-svc>:6333",
+#        "EMBEDDING_TENSOR": "features", "QDRANT_DISTANCE": "cosine"}}' \
+#     --working-dir <dir containing the job script> python <job-script>.py
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: ml-jobs
+  namespace: ml
+spec:
+  rayVersion: "2.58.0"
+  headGroupSpec:
+    rayStartParams:
+      dashboard-host: "0.0.0.0"
+      num-cpus: "2"
+    template:
+      spec:
+        containers:
+          - name: ray-head
+            # TODO: replace with the registry image tag (see header comment)
+            image: ml-jobrunner:latest
+            imagePullPolicy: IfNotPresent
+            # No-ENTRYPOINT image: keep the container alive after `ray start`
+            # returns (the head flags mirror the rayStartParams above).
+            command: ["/bin/sh", "-c"]
+            args:
+              - "ray start --head --port=6379 --dashboard-host=0.0.0.0 --num-cpus=2 && sleep infinity"
+            ports:
+              - containerPort: 6379    # GCS
+              - containerPort: 8265    # dashboard / `ray job submit`
+              - containerPort: 10001   # ray client
+            # Point at your cluster's platform services (S3/MinIO, MLflow, Qdrant,
+            # Triton, DeepLake dataset path) — mirror the .env contract.
+            env:
+              - name: S3_ENDPOINT
+                value: "http://minio:9000"
+  workerGroupSpecs:
+    - groupName: workers
+      replicas: 2
+      minReplicas: 1
+      maxReplicas: 4
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+            - name: ray-worker
+              image: ml-jobrunner:latest
+              imagePullPolicy: IfNotPresent
+              # No-ENTRYPOINT image: keep the container alive after `ray start`.
+              # <head-svc> = the RayCluster head service (ml-jobs-head-svc.<ns>.svc).
+              command: ["/bin/sh", "-c"]
+              args:
+                - "ray start --address=ml-jobs-head-svc.ml.svc:6379 && sleep infinity"

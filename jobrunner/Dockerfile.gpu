@@ -1,0 +1,42 @@
+# ml-jobrunner-gpu: CUDA variant of the job-runner image.
+#
+# Same job contract as jobrunner/Dockerfile (env-driven, stdio, no
+# ENTRYPOINT, same service endpoints) plus torch (CUDA 12.8) + ultralytics
+# for GPU training / export / eval jobs (see examples/detection/).
+#
+#   build:  docker build -f jobrunner/Dockerfile.gpu -t ml-jobrunner-gpu:latest jobrunner/
+#   use:    gpu_job_task("train_yolo_voc12.py", job_id="train_yolo") in a DAG
+#           (dags/jobtask.py passes device_requests=[DeviceRequest(count=1,
+#           capabilities=[["gpu"]])] + shm_size to the container)
+#
+# Host prerequisite (already satisfied on this machine — verify with):
+#   docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
+# The base image bundles Python 3.11 (conda) and torch 2.7.1+cu12.8; the
+# pip stack below is kept in lock-step with jobrunner/Dockerfile.
+
+FROM pytorch/pytorch:2.7.1-cuda12.8-cudnn9-runtime
+
+# Keep pins identical to jobrunner/Dockerfile (one package per layer so a
+# cache hit covers the unchanged lower layers)
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir deeplake==3.9.52
+RUN pip install --no-cache-dir mlflow==3.15.1
+RUN pip install --no-cache-dir onnx==1.19.1 onnxruntime==1.19.2 skl2onnx==1.20.0
+RUN pip install --no-cache-dir qdrant-client==1.16.2
+RUN pip install --no-cache-dir "tritonclient[all]==2.71.0"
+RUN pip install --no-cache-dir "ray[default]==2.58.0"
+# Object-detection stack (YOLOv8/YOLO11 family; pulls in opencv-python,
+# matplotlib, scipy — all reused by the example jobs)
+RUN pip install --no-cache-dir ultralytics==8.4.129
+# fastdup (DINOv2 duplicate detection + embeddings) and scikit-learn
+# (DBSCAN kNN clustering for cluster-pure splits)
+RUN pip install --no-cache-dir fastdup==2.54 scikit-learn
+# opencv-python (pulled by ultralytics) needs X11 libs absent from this base;
+# the headless build provides the identical cv2 API for server use. Pin 4.x:
+# OpenCV 5.x removed cv2.INTER_CUBIC etc. which fastdup's image.py still uses.
+RUN pip uninstall -y opencv-python opencv-python-headless && pip install --no-cache-dir opencv-python-headless==4.14.0.94
+
+COPY runner.py /runner.py
+
+# No ENTRYPOINT: the DAG's DockerOperator passes the explicit command
+# ["python", "/runner.py", <script>]; Ray/K8s pass their own.
