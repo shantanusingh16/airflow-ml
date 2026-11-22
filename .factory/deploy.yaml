@@ -48,7 +48,8 @@ ui:                                  # published on 127.0.0.1 random ports only
     port: 5000
 datasets:
   coco: {services: [airflow-worker], target: /datasets/coco}
-gpu: {vram_gb: 8}                    # refused to start with less free VRAM (llama-swap shares the card)
+  voc2012: {services: [airflow-worker], target: /datasets/voc2012}
+gpu: {vram_gb: 8}                    # peak VRAM: staging warns below it, prod refuses
 staging:
   ttl_hours: 4
   ready_timeout_s: 1500
