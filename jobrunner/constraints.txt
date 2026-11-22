@@ -1,0 +1,18 @@
+# Shared constraints for the job-runner images (Dockerfile + Dockerfile.gpu).
+#
+# t_29094ca2: the GPU image is forced to numpy<2 by fastdup 2.54 (its final
+# release) and deeplake 3.9.52 requires pillow~=10.4.0. Every `pip install`
+# in both Dockerfiles passes this file with `-c`, so unpinned transitive
+# dependencies (scipy, pillow-heif, matplotlib, pyarrow, ...) can only
+# resolve to releases compatible with the pins below: pip backtracks to
+# older releases instead of silently upgrading the stack.
+#
+# Keep the CPU and GPU images in lock-step: change this file only together
+# with both Dockerfiles.
+numpy==1.26.4
+pillow==10.4.0
+scikit-learn==1.5.0
+pandas==2.3.2
+scipy==1.16.3
+opencv-python==4.10.0.84
+pillow-heif==0.22.0
