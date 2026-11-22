@@ -180,19 +180,30 @@ DAG_ID=voc12_demo make trigger
 DAG_ID=voc12_demo make runinfo
 ```
 
-- `SAMPLE` (stack env, read at DAG parse time; default `1000`, `0` = all
-  ~5,138 annotated pairs) sizes the upload: the first N ids in sorted
-  order. `MIN_IMAGES` is set to that count automatically (`5000`, the
-  full-pipeline floor, for the full set). A non-default value goes in the
-  deployment env (`.env` / the factory env block) *before* the stack starts
-  — the DAG bakes it in at parse time, so it cannot be set per trigger.
+- `SAMPLE` (per-trigger DAG param; default from the stack env `SAMPLE`,
+  else `1000`; `0` = all ~5,138 annotated pairs) sizes the upload: the
+  first N ids in sorted order. A non-default value is set per trigger in
+  the UI's "Trigger w/ config" form or via the API
+  `conf: {"SAMPLE": 200}`; the stack-env default goes in the deployment env
+  (`.env` / the factory env block) before the stack starts. `MIN_IMAGES` is
+  set to that count automatically (`5000`, the full-pipeline floor, for the
+  full set).
+- Caveat: `verify_upload` counts **every** JPEG under the shared prefix
+  `datasets/voc12/VOC2012/` (shared with the full pipeline), not just what
+  this trigger uploaded. If the prefix already holds more JPEGs than the
+  current selection (an earlier larger `SAMPLE`, or the full pipeline's
+  5,717-image upload), verification fails — and pruning the shared bucket
+  is not an option. Keep the prefix empty, or holding only an earlier
+  upload of the same or a smaller sample, before triggering the demo.
 - The VOC2012 tree must be visible to the job container: staging
   bind-mounts the host dataset read-only into `airflow-worker` at
   `/datasets/voc2012` (the `datasets:` block in `deploy.yaml`) and the shim
-  re-exports it into the job container at the same path. On a bare compose
-  host, set `VOC_DATASET_HOST_DIR` to the host path of the tree
-  (`JPEGImages/` + `Annotations/` required; an image counts only if its XML
-  is present).
+  re-exports it into the job container at the same path. The mount source
+  default, `VOC_DATASET_HOST_DIR=/datasets/voc2012`, is the in-worker path:
+  on the staging stack the shim provides that mapping (the operator confirms
+  it during acceptance); on a bare compose host set `VOC_DATASET_HOST_DIR`
+  to the real host path of the tree (`JPEGImages/` + `Annotations/`
+  required; an image counts only if its XML is present).
 
 ### Artifacts
 

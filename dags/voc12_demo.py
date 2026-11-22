@@ -8,7 +8,8 @@ detection job scripts from voc12_full_pipeline:
                           s3://<bucket>/datasets/voc12/VOC2012/ and writes
                           ImageSets/Main/trainval.txt listing exactly the
                           uploaded ids (deterministic first SAMPLE of the
-                          sorted annotated ids; SAMPLE=0 = all; default 1000)
+                          sorted annotated ids; SAMPLE=0 = all; default from
+                          the stack env SAMPLE, else 1000)
   2. verify_upload (CPU)  the upload landed complete: >= MIN_IMAGES JPEGs,
                           the same count of XMLs, trainval.txt line count
                           matching the JPEG count (fails a partial upload
@@ -29,22 +30,25 @@ Trigger (no schedule — manual only), from the Airflow UI (Browse ->
 
     DAG_ID=voc12_demo make unpause && DAG_ID=voc12_demo make trigger
 
-``SAMPLE`` is read from the stack env at DAG parse time (like every other
-env in this repo) and baked into the tasks: set it in the deployment env
-(`.env` / the factory env block) before starting the stack, not per trigger.
+``SAMPLE`` is a per-trigger DAG param: override it in the UI's "Trigger w/
+config" form or via the API with ``conf: {"SAMPLE": 200}``; its default
+comes from the stack env ``SAMPLE`` (injected into the Airflow containers
+by docker-compose), otherwise 1000.
 """
 from datetime import datetime
 
 import os
 
 from airflow import DAG
+from airflow.sdk import Param
 
 from jobtask import gpu_job_task, job_task
 
-# --- demo knobs (stack env, read at parse time) --------------------------------
-# How many annotated pairs upload_voc12 stages to MinIO: >0 = first SAMPLE
-# ids in sorted order (deterministic), 0 = all annotated pairs.
-SAMPLE = int(os.environ.get("SAMPLE", "1000"))
+# --- demo knobs ----------------------------------------------------------------
+# SAMPLE is a per-trigger DAG param (the ``params=`` block below): >0 =
+# first N ids in sorted order (deterministic), 0 = all annotated pairs. Its
+# default is the stack env SAMPLE, which docker-compose injects into the
+# Airflow containers (${SAMPLE:-1000}).
 # Source of the read-only dataset bind mount (resolved by the docker daemon /
 # staging shim, not by the job): in staging the shim re-exports the host
 # VOC2012 tree the worker sees at /datasets/voc2012; on other hosts set
@@ -61,7 +65,7 @@ DEMO_ENV = {
     # exact count when sampling; for the full set the same floor as the full
     # pipeline (below the 5717-image full trainval — this tree has 5138
     # annotated pairs)
-    "MIN_IMAGES": str(SAMPLE) if SAMPLE > 0 else "5000",
+    "MIN_IMAGES": "{{ params.SAMPLE if params.SAMPLE | int > 0 else 5000 }}",
     "YOLO_MODEL": "yolo11n.pt",
     "IMGSZ": "640",
     "EPOCHS": "30",
@@ -89,10 +93,12 @@ with DAG(
     start_date=datetime(2026, 11, 22),
     catchup=False,
     tags=["demo", "voc12"],
+    params={"SAMPLE": Param(int(os.environ.get("SAMPLE", "1000")),
+                            type="integer", minimum=0)},
 ) as dag:
     upload = job_task(
         "upload_voc12.py", job_id="upload_voc12",
-        extra_env={**DEMO_ENV, "SAMPLE": str(SAMPLE)},
+        extra_env={**DEMO_ENV, "SAMPLE": "{{ params.SAMPLE }}"},
         extra_mounts=[DATASET_MOUNT],
         timeout=3600,
     )
