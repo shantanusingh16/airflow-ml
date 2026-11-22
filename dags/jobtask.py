@@ -12,7 +12,13 @@ from airflow.exceptions import AirflowException
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.docker.operators.docker import DockerOperator
 
-PROJECT_DIR = os.environ.get("AIRFLOW_PROJ_DIR", "/run/media/shantanu/Volume/Projects/airflow-ml")
+PROJECT_DIR = os.environ.get("AIRFLOW_PROJ_DIR")
+if not PROJECT_DIR:
+    raise AirflowException(
+        "AIRFLOW_PROJ_DIR is not set (or is empty). Set it in .env / the docker-compose "
+        "environment to the host path of the airflow-ml project directory; it is used to "
+        "bind-mount dags/, config/ and triton-models/ into job containers."
+    )
 
 S3_BUCKET = os.environ.get("S3_BUCKET", "ml-artifacts")
 S3_REGION = os.environ.get("S3_REGION", "us-east-1")
