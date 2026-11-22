@@ -205,7 +205,7 @@ DAG_ID=ml_platform_pipeline make runinfo
 
 | Var | Meaning | Default |
 |-----|---------|---------|
-| `AIRFLOW_PROJ_DIR` | Host path mapped to `/opt/airflow/dags` + `config/` | this directory |
+| `AIRFLOW_PROJ_DIR` | Host path mapped to `/opt/airflow/dags` + `config/`, AND passed into every airflow-* container so job containers' bind mounts (dags/, config/, triton-models/) resolve on the correct host | required — no default |
 | `AIRFLOW_IMAGE_NAME` | Airflow image tag (built by `Dockerfile.airflow`) | `airflow-ml:3.3.1` |
 | `AIRFLOW_UID` / `AIRFLOW_GID` | UID:GID to run airflow as (use `id -u`) | `1000:0` |
 | `DOCKER_GROUP` | Host docker group (name or numeric GID — numeric works where name lookup fails) | `973` |
