@@ -65,6 +65,9 @@ x-airflow-common: &airflow-common
     TRITON_GRPC_URL: ${TRITON_GRPC_URL:-triton:8000}
     TRITON_MODEL_NAME: ${TRITON_MODEL_NAME:-linreg_onnx}
     MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-http://mlflow:5000}
+    # voc12_demo: per-trigger param default + dataset mount source
+    SAMPLE: ${SAMPLE:-1000}
+    VOC_DATASET_HOST_DIR: ${VOC_DATASET_HOST_DIR:-/datasets/voc2012}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config

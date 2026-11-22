@@ -145,6 +145,66 @@ DAG_ID=ml_platform_pipeline make trigger
 DAG_ID=ml_platform_pipeline make runinfo
 ```
 
+### Demo pipeline (`voc12_demo`)
+
+Short, demo-friendly run over **PASCAL VOC 2012** that reuses the detection
+jobs of the full pipeline and stops before training:
+
+1. `upload_voc12` (CPU) — copies the annotated JPEG+XML pairs from the local
+   VOC2012 tree (bind-mounted read-only at `/datasets/voc2012` in the job
+   container) to `s3://<bucket>/datasets/voc12/VOC2012/{JPEGImages,
+   Annotations}/` and writes `ImageSets/Main/trainval.txt` listing exactly
+   the uploaded ids. Idempotent (existing objects with the same size are
+   skipped); prints upload/skip counts.
+2. `verify_upload` (CPU) — the uploaded prefix has >= `MIN_IMAGES` JPEGs, the
+   same count of XMLs, and a `trainval.txt` with a matching line count, so a
+   partial upload fails before any GPU time is spent.
+3. `ingest_voc12` (CPU) — parses every XML and rebuilds the DeepLake dataset
+   `s3://<bucket>/deeplake/voc12` (images, bboxes, classes), publishing
+   `data/<run>/voc12_ingest_manifest.json`.
+4. `embed_fastdup` (GPU) — fastdup DINOv2 embeddings (576-d) + image
+   attributes + duplicate groups committed to DeepLake, and a 4-page PDF
+   report at `analysis/<run>/voc12_embed_report.pdf`.
+5. `cluster_split` (GPU) — DBSCAN kNN clustering of the embeddings; whole
+   clusters are assigned to train/val/test at 70/10/20 (no near-duplicate
+   ever crosses a split); split counts are logged and
+   `data/<run>/voc12_cluster_manifest.json` + `voc12_split_manifest.json`
+   are published.
+
+Trigger (no schedule — manual only), from the Airflow UI (Browse →
+`voc12_demo` → trigger) or on a compose stack:
+
+```bash
+DAG_ID=voc12_demo make unpause
+DAG_ID=voc12_demo make trigger
+DAG_ID=voc12_demo make runinfo
+```
+
+- `SAMPLE` (per-trigger DAG param; default from the stack env `SAMPLE`,
+  else `1000`; `0` = all ~5,138 annotated pairs) sizes the upload: the
+  first N ids in sorted order. A non-default value is set per trigger in
+  the UI's "Trigger w/ config" form or via the API
+  `conf: {"SAMPLE": 200}`; the stack-env default goes in the deployment env
+  (`.env` / the factory env block) before the stack starts. `MIN_IMAGES` is
+  set to that count automatically (`5000`, the full-pipeline floor, for the
+  full set).
+- Caveat: `verify_upload` counts **every** JPEG under the shared prefix
+  `datasets/voc12/VOC2012/` (shared with the full pipeline), not just what
+  this trigger uploaded. If the prefix already holds more JPEGs than the
+  current selection (an earlier larger `SAMPLE`, or the full pipeline's
+  5,717-image upload), verification fails — and pruning the shared bucket
+  is not an option. Keep the prefix empty, or holding only an earlier
+  upload of the same or a smaller sample, before triggering the demo.
+- The VOC2012 tree must be visible to the job container: staging
+  bind-mounts the host dataset read-only into `airflow-worker` at
+  `/datasets/voc2012` (the `datasets:` block in `deploy.yaml`) and the shim
+  re-exports it into the job container at the same path. The mount source
+  default, `VOC_DATASET_HOST_DIR=/datasets/voc2012`, is the in-worker path:
+  on the staging stack the shim provides that mapping (the operator confirms
+  it during acceptance); on a bare compose host set `VOC_DATASET_HOST_DIR`
+  to the real host path of the tree (`JPEGImages/` + `Annotations/`
+  required; an image counts only if its XML is present).
+
 ### Artifacts
 
 - `data/<run_id>/` — CSVs, `manifest.json`, `deeplake_commit.json` (commit id + `ds.info` snapshot)

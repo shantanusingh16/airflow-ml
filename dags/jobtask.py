@@ -133,13 +133,17 @@ def job_task(
     image: str | None = None,
     device_requests=None,
     shm_size: str | None = None,
+    extra_mounts: list[dict] | None = None,
     timeout: int = 3600,
 ) -> DockerOperator:
     """DockerOperator task: run ``dags/jobs/<script>`` in a job-runner image.
 
     ``image`` overrides the runner image (e.g. the CUDA build
     ``ml-jobrunner-gpu:latest``); ``device_requests`` / ``shm_size`` pass
-    through to the Docker SDK (``None`` = unset) for GPU / torch jobs.
+    through to the Docker SDK (``None`` = unset) for GPU / torch jobs;
+    ``extra_mounts`` adds bind mounts on top of the standard ones
+    (dags/ + triton-models), e.g. a read-only dataset dir for a job
+    (``gpu_job_task()`` deliberately keeps its narrower surface).
     """
     return DockerOperator(
         task_id=job_id,
@@ -148,7 +152,7 @@ def job_task(
         # that also serves as a Ray node, where the orchestrator sets the command).
         command=["python", "/runner.py", f"{JOBS_IN_CONTAINER}/{script}"],
         environment=_job_env(job_id, extra_env),
-        mounts=_job_mounts(),
+        mounts=_job_mounts() + (extra_mounts or []),
         # Join the compose network so the container can reach minio/mlflow/qdrant/triton
         network_mode=JOB_NETWORK,
         # --rm: the container is removed on exit (success OR failure). The full
