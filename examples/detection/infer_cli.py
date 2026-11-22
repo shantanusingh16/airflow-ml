@@ -45,8 +45,14 @@ MODEL_NAME = os.environ.get("TRITON_MODEL", "yolo_voc12")
 CONF = float(os.environ.get("DET_CONF", "0.25"))
 NMS_IOU = float(os.environ.get("DET_NMS_IOU", "0.45"))
 
-PROJECT_DIR = Path(os.environ.get("AIRFLOW_PROJ_DIR",
-                                  "/run/media/shantanu/Volume/Projects/airflow-ml"))
+PROJECT_DIR = os.environ.get("AIRFLOW_PROJ_DIR")
+if not PROJECT_DIR:
+    raise RuntimeError(
+        "AIRFLOW_PROJ_DIR is not set (or is empty). Set it in .env / the environment "
+        "to the host path of the airflow-ml project directory; it is used to locate "
+        "triton-models/<model>/model_info.json."
+    )
+PROJECT_DIR = Path(PROJECT_DIR)
 MODEL_INFO = Path(os.environ.get(
     "MODEL_INFO_JSON", PROJECT_DIR / "triton-models" / MODEL_NAME / "model_info.json"))
 
