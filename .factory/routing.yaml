@@ -1,0 +1,12 @@
+project: airflow-ml
+# Edit anytime (at kickoff or mid-sprint) to route functions to any registered harness.
+# Resolution: card front matter -> overrides.<function> -> function default -> defaults.<function's mode>.
+defaults:
+  print: omp                       # code_implementation, bugfix_loop
+  interactive: claude-interactive  # kickoff_roundtable
+  # executor: omitted -> policy default 'sandbox'; a project may only pick stronger isolation
+overrides:                         # only where a function differs from its mode default
+  architecture_design:
+    harness: claude
+  egm_review:
+    harness: claude
