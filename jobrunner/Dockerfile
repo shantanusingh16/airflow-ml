@@ -12,15 +12,21 @@
 # Extend the pip install below with whatever your jobs need
 # (torch, xgboost, ...). Keep it lean-ish: the image is rebuilt with
 # `docker compose --profile build build jobrunner` and reused by all jobs.
+#
+# numpy/pillow/scikit-learn/pandas are pinned identically to Dockerfile.gpu so
+# the CPU and GPU job images stay in lock-step: the GPU image is forced to
+# numpy<2 (fastdup 2.54) and pillow==10.4.0 (deeplake 3.9.52), so the CPU
+# image follows the same pins and job artifacts behave identically on both.
 FROM python:3.12-slim
 
 RUN pip install --no-cache-dir --upgrade pip && \
     # staged installs: a single 12-package resolution pass exceeds pip's
     # resolver depth (tritonclient[all] + ray + mlflow graphs are deep)
     pip install --no-cache-dir \
-        "numpy" \
-        "pandas" \
-        "scikit-learn" \
+        "numpy==1.26.4" \
+        "pandas==2.3.2" \
+        "scikit-learn==1.5.0" \
+        "pillow==10.4.0" \
         "boto3" \
         "requests" && \
     pip install --no-cache-dir "deeplake==3.9.52" && \
@@ -33,4 +39,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir "tritonclient[all]==2.71.0" && \
     pip install --no-cache-dir "ray[default]==2.58.0"   # [default] adds the dashboard deps so `ray start --include-dashboard` / `ray job submit` work on KubeRay nodes
 COPY runner.py /runner.py
+# Gate: fail the build if any installed package declares an unsatisfied
+# requirement (mirrors Dockerfile.gpu; catches dependency drift).
+RUN pip check
 # NOTE: no ENTRYPOINT on purpose (dual-mode image, see header comment).
