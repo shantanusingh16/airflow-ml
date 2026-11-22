@@ -17,7 +17,7 @@ if not PROJECT_DIR:
     raise AirflowException(
         "AIRFLOW_PROJ_DIR is not set (or is empty). Set it in .env / the docker-compose "
         "environment to the host path of the airflow-ml project directory; it is used to "
-        "bind-mount dags/, config/ and triton-models/ into job containers."
+        "bind-mount dags/ and triton-models/ into job containers."
     )
 
 S3_BUCKET = os.environ.get("S3_BUCKET", "ml-artifacts")

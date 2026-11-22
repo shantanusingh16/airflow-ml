@@ -37,7 +37,7 @@ x-airflow-common: &airflow-common
     # Shared JWT secret for all airflow components (task-log auth, API)
     AIRFLOW__API__SECRET_KEY: ${AIRFLOW__API__SECRET_KEY}
     # Host path of the airflow-ml project dir, passed into every airflow-*
-    # container so job-task bind mounts (dags/, config/, triton-models/)
+    # container so job-task bind mounts (dags/, triton-models/)
     # resolve on the correct host. No default: an unset value must stay
     # visible (empty), not silently fall back to a host-specific path.
     AIRFLOW_PROJ_DIR: ${AIRFLOW_PROJ_DIR}
