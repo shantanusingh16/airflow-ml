@@ -15,59 +15,87 @@
 # pip stack below is kept in lock-step with jobrunner/Dockerfile.
 #
 # Why the pins below (numpy/fastdup/pillow conflict, card t_29094ca2):
-#   numpy==1.26.4    fastdup 2.54 (its final release) pins numpy<2.0; the base
-#                    image ships 1.26.4, so pin it instead of letting a later
-#                    layer (old: opencv-python-headless 4.14) drag in numpy 2.x.
+#   numpy==1.26.4    fastdup 2.54 (its final release) pins numpy<2.0. Newer
+#                    scipy/opencv releases declare numpy>=2, so the shared
+#                    constraints.txt (passed via `-c` to every pip install)
+#                    keeps every layer on 1.26.4.
 #   pillow==10.4.0   exactly what deeplake 3.9.52 requires (pillow~=10.4.0).
-#                    fastdup declares Pillow==10.3.0, a test-time pin that the
-#                    voc12 pipeline ran fine past in production; it is
-#                    normalized in fastdup's installed metadata, see below.
+#                    fastdup declares Pillow==10.3.0, a test-time pin that
+#                    the voc12 pipeline ran fine past in production; it is
+#                    normalized in fastdup's installed metadata (see below).
+#                    pillow-heif is constrained to 0.22.0 — the last release
+#                    that accepts pillow 10.x (all 1.x releases require
+#                    pillow>=11.1.0).
 #   scikit-learn==1.5.0  fastdup's exact pin; pandas==2.3.2 is pre-3.0 and
 #                    compatible with fastdup 2.54 / scikit-learn 1.5.0.
-#   opencv-python==4.10.0.84 (GUI build)  the package NAME ultralytics 8.4.129
-#                    requires (headless does not satisfy it). 4.12+ demands
-#                    numpy 2 on all pythons; 4.10.x still accepts numpy 1.x.
-#                    apt libGL/libglib make `import cv2` work headless.
+#   scipy==1.16.3    newest scipy whose numpy range (>=1.25.2,<2.6) covers
+#                    1.26.4 (scipy 1.18.x requires numpy>=2.0.0).
+#   opencv-python==4.10.0.84 (GUI build)  the package NAME ultralytics
+#                    8.4.129 requires (headless does not satisfy it). 4.12+
+#                    demands numpy 2 on all pythons; 4.10.x still accepts
+#                    numpy 1.x. apt libGL/libglib make `import cv2` work
+#                    headless. It MUST be installed before ultralytics (see
+#                    layer order below).
 FROM pytorch/pytorch:2.7.1-cuda12.8-cudnn9-runtime
 
 # Keep pins identical to jobrunner/Dockerfile (one package group per layer so
-# a cache hit covers the unchanged lower layers)
+# a cache hit covers the unchanged lower layers). The shared constraints.txt
+# is passed to every pip install so unpinned transitive dependencies (scipy,
+# pillow-heif, matplotlib, ...) cannot pull in releases that break the
+# pinned stack.
+COPY constraints.txt /constraints.txt
 RUN pip install --no-cache-dir --upgrade pip
 # Shared scientific set — identical pins to jobrunner/Dockerfile (lock-step)
-RUN pip install --no-cache-dir numpy==1.26.4 pillow==10.4.0 scikit-learn==1.5.0 pandas==2.3.2
-RUN pip install --no-cache-dir deeplake==3.9.52
-RUN pip install --no-cache-dir mlflow==3.15.1
-RUN pip install --no-cache-dir onnx==1.19.1 onnxruntime==1.19.2 skl2onnx==1.20.0
-RUN pip install --no-cache-dir qdrant-client==1.16.2
-RUN pip install --no-cache-dir "tritonclient[all]==2.71.0"
-RUN pip install --no-cache-dir "ray[default]==2.58.0"
-# Object-detection stack (YOLOv8/YOLO11 family; pulls in matplotlib, scipy —
-# all reused by the example jobs). Its opencv-python requirement is a package
-# NAME: opencv-python-headless does NOT satisfy it, which is what broke
-# `pip check` before.
-RUN pip install --no-cache-dir ultralytics==8.4.129
-# GUI OpenCV needs X11 libs absent from this base; these make `import cv2`
-# work without a display (server container).
+RUN pip install --no-cache-dir -c /constraints.txt numpy==1.26.4 pillow==10.4.0 scikit-learn==1.5.0 pandas==2.3.2
+RUN pip install --no-cache-dir -c /constraints.txt deeplake==3.9.52
+RUN pip install --no-cache-dir -c /constraints.txt mlflow==3.15.1
+RUN pip install --no-cache-dir -c /constraints.txt onnx==1.19.1 onnxruntime==1.19.2 skl2onnx==1.20.0
+RUN pip install --no-cache-dir -c /constraints.txt qdrant-client==1.16.2
+RUN pip install --no-cache-dir -c /constraints.txt "tritonclient[all]==2.71.0"
+RUN pip install --no-cache-dir -c /constraints.txt "ray[default]==2.58.0"
+# GUI OpenCV must exist BEFORE ultralytics is installed (B2, t_29094ca2):
+# ultralytics requires the package NAME `opencv-python` (>=4.7.0,
+# !=4.13.0.90). If it were not installed yet, pip would resolve that
+# requirement to the newest 4.12+ release, which declares numpy>=2 and
+# would upgrade numpy from 1.26.4 to 2.x — exactly the failure this card
+# fixes. The base image has no X11 libs; these make `import cv2` work
+# without a display (server container).
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 # 4.10.0.84: last release of the 4.10 line; still numpy-1 compatible,
 # satisfies ultralytics' >=4.7.0,!=4.13.0.90.
-RUN pip install --no-cache-dir opencv-python==4.10.0.84
+RUN pip install --no-cache-dir -c /constraints.txt opencv-python==4.10.0.84
+# Object-detection stack (YOLOv8/YOLO11 family; pulls in matplotlib —
+# all reused by the example jobs). opencv-python is already pinned above, so
+# ultralytics' requirement is satisfied by the installed 4.10.0.84 and
+# numpy stays at 1.26.4.
+RUN pip install --no-cache-dir -c /constraints.txt ultralytics==8.4.129
 # fastdup 2.54 is the LAST fastdup release and pins Pillow==10.3.0 and
 # opencv-python-headless>=4.8.0.0, both of which collide with this stack
 # (deeplake 3.9.52 needs pillow~=10.4.0; ultralytics needs opencv-python).
 # Install it without its pins, normalize exactly those two requirements in
 # its installed metadata so `pip check` reflects the compatible reality,
 # then install its remaining runtime dependencies normally (all compatible
-# with the pins above).
+# with the pins above; pillow-heif is constrained to 0.22.0, the last
+# release that accepts pillow 10.x).
 RUN pip install --no-cache-dir --no-deps fastdup==2.54
-RUN python -c "from importlib.metadata import distribution; p = distribution('fastdup').locate_file('METADATA'); t = p.read_text(); t = t.replace('Requires-Dist: Pillow==10.3.0', 'Requires-Dist: Pillow>=10.3.0').replace('Requires-Dist: opencv-python-headless>=4.8.0.0', 'Requires-Dist: opencv-python>=4.8.0.0'); p.write_text(t)"
-RUN pip install --no-cache-dir "pyOpenSSL>=24.0.0" cryptography "joblib~=1.2.0" "PyYAML~=6.0" "requests>=2.32.4" "setuptools==78.1.1" "sentry-sdk==2.27.0" "tqdm==4.66.3" psutil pillow_heif packaging
+# Normalize the two colliding pins in fastdup's installed METADATA.
+# NOTE: importlib.metadata's Distribution.locate_file() is anchored at
+# site-packages (the PARENT of the dist-info dir), so the METADATA file must
+# be addressed through the dist-info path itself (`_path`) — this is what
+# B1 of the EGM review caught. After this edit fastdup's RECORD hashes no
+# longer match its METADATA: that is intentional and harmless, `pip check`
+# ignores RECORD and uninstall/reinstall still work — do not "repair" it.
+RUN python -c "from pathlib import Path; from importlib.metadata import distribution; p = Path(distribution('fastdup')._path) / 'METADATA'; t = p.read_text(); assert t.count('Requires-Dist: Pillow==10.3.0') == 1, 'fastdup METADATA: Pillow pin not found'; assert t.count('Requires-Dist: opencv-python-headless>=4.8.0.0') == 1, 'fastdup METADATA: opencv pin not found'; p.write_text(t.replace('Requires-Dist: Pillow==10.3.0', 'Requires-Dist: Pillow>=10.3.0').replace('Requires-Dist: opencv-python-headless>=4.8.0.0', 'Requires-Dist: opencv-python>=4.8.0.0'))"
+RUN pip install --no-cache-dir -c /constraints.txt "pyOpenSSL>=24.0.0" cryptography "joblib~=1.2.0" "PyYAML~=6.0" "requests>=2.32.4" "setuptools==78.1.1" "sentry-sdk==2.27.0" "tqdm==4.66.3" psutil pillow_heif packaging
 COPY runner.py /runner.py
 # Gate: fail the build if any installed package declares an unsatisfied
 # requirement — this is what catches numpy/pillow/opencv drift.
 RUN pip check
+# Smoke test: import the GPU stack so a broken pin fails the build here,
+# not at job time.
+RUN python -c "import numpy, cv2, fastdup, ultralytics, deeplake"
 
 # No ENTRYPOINT: the DAG's DockerOperator passes the explicit command
 # ["python", "/runner.py", <script>]; Ray/K8s pass their own.

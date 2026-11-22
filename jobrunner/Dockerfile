@@ -3,7 +3,7 @@
 # Dual-mode, orchestrator-agnostic:
 #   1. Airflow DockerOperator jobs — the DAG passes the full command:
 #        python /runner.py <job-script.py> [job-args ...]
-#      (see dags/jobtask.py; there is intentionally NO ENTRYPOINT so that ...)
+#      (see dags/jobtask.py; there is intentionally NO ENTRYPOINT so that ...).
 #   2. Ray nodes (KubeRay on k8s, docker-based Ray clusters, ...) supply their
 #      own command, e.g. `ray start --head --port=6379 ...` or `python job.py`.
 #      Ray version is pinned here and must match the version of every node in
@@ -13,33 +13,42 @@
 # (torch, xgboost, ...). Keep it lean-ish: the image is rebuilt with
 # `docker compose --profile build build jobrunner` and reused by all jobs.
 #
-# numpy/pillow/scikit-learn/pandas are pinned identically to Dockerfile.gpu so
-# the CPU and GPU job images stay in lock-step: the GPU image is forced to
-# numpy<2 (fastdup 2.54) and pillow==10.4.0 (deeplake 3.9.52), so the CPU
-# image follows the same pins and job artifacts behave identically on both.
+# The shared scientific stack (numpy/pillow/scikit-learn/pandas/scipy) is
+# constrained identically in this file and in Dockerfile.gpu via
+# constraints.txt (t_29094ca2), so the CPU and GPU job images stay in
+# lock-step: the GPU image is forced to numpy<2 (fastdup 2.54) and
+# pillow==10.4.0 (deeplake 3.9.52), and this image follows the same pins,
+# so job artifacts behave identically on both.
 FROM python:3.12-slim
+
+# Shared constraints (t_29094ca2): every pip install below passes this file,
+# so unpinned transitive dependencies cannot upgrade the pinned stack.
+COPY constraints.txt /constraints.txt
 
 RUN pip install --no-cache-dir --upgrade pip && \
     # staged installs: a single 12-package resolution pass exceeds pip's
     # resolver depth (tritonclient[all] + ray + mlflow graphs are deep)
-    pip install --no-cache-dir \
+    pip install --no-cache-dir -c /constraints.txt \
         "numpy==1.26.4" \
         "pandas==2.3.2" \
         "scikit-learn==1.5.0" \
         "pillow==10.4.0" \
         "boto3" \
         "requests" && \
-    pip install --no-cache-dir "deeplake==3.9.52" && \
-    pip install --no-cache-dir "mlflow==3.15.1" && \
-    pip install --no-cache-dir \
+    pip install --no-cache-dir -c /constraints.txt "deeplake==3.9.52" && \
+    pip install --no-cache-dir -c /constraints.txt "mlflow==3.15.1" && \
+    pip install --no-cache-dir -c /constraints.txt \
         "onnx==1.19.1" \
         "onnxruntime==1.19.2" \
         "skl2onnx==1.20.0" && \
-    pip install --no-cache-dir "qdrant-client==1.16.2" && \
-    pip install --no-cache-dir "tritonclient[all]==2.71.0" && \
-    pip install --no-cache-dir "ray[default]==2.58.0"   # [default] adds the dashboard deps so `ray start --include-dashboard` / `ray job submit` work on KubeRay nodes
+    pip install --no-cache-dir -c /constraints.txt "qdrant-client==1.16.2" && \
+    pip install --no-cache-dir -c /constraints.txt "tritonclient[all]==2.71.0" && \
+    pip install --no-cache-dir -c /constraints.txt "ray[default]==2.58.0"   # [default] adds the dashboard deps so `ray start --include-dashboard` / `ray job submit` work on KubeRay nodes
 COPY runner.py /runner.py
 # Gate: fail the build if any installed package declares an unsatisfied
 # requirement (mirrors Dockerfile.gpu; catches dependency drift).
 RUN pip check
+# Smoke test: import the shared stack so a broken pin fails the build here,
+# not at job time.
+RUN python -c "import numpy, pandas, sklearn, scipy, deeplake, mlflow, onnx"
 # NOTE: no ENTRYPOINT on purpose (dual-mode image, see header comment).
