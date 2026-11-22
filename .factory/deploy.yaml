@@ -15,6 +15,7 @@ container_socket: [airflow-worker]   # gets this environment's Docker API shim a
 #  "*": {AIRFLOW_PROJ_DIR: "{src}"}   # jobtask.py otherwise falls back to the operator's real project path
 env:
   AIRFLOW_PROJ_DIR: "{src}"          # host path the worker hands to DockerOperator mounts
+  VOC_DATASET_HOST_DIR: /run/media/shantanu/Volume/Datasets/voc2012/test   # job-container bind source (host path)
   AIRFLOW_UID: "50000"
   AIRFLOW_GID: "0"
   DOCKER_GROUP: "0"                  # socket is root-group inside the rootless user namespace
