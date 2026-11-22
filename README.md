@@ -122,7 +122,7 @@ endpoints via `.env` → `x-airflow-common-env` → `dags/jobtask.py`. Host-side
 
 | Service | What it is | Host ports |
 |---------|------------|------------|
-| `mlflow` | Experiment logging server + UI at `http://localhost:5000`; sqlite state in the `mlflow-data` volume; run artifacts (sklearn/ONNX model weights) land in the `mlflow/` prefix of `ml-artifacts` via the server-side artifact proxy (`--artifacts-destination s3://ml-artifacts/mlflow`; the MLflow 3.x S3 store reads standard `AWS_*` env vars, and the server needs `--allowed-hosts` covering the container hostname with port, e.g. `mlflow:5000`). Job containers only need the tracking URI | **5000** |
+| `mlflow` | Experiment logging server + UI at `http://localhost:5000`; sqlite state in the `mlflow-data` volume; run artifacts (sklearn/ONNX model weights) land in the `mlflow/` prefix of `ml-artifacts` via the server-side artifact proxy (`--artifacts-destination s3://ml-artifacts/mlflow`; the MLflow 3.x S3 store reads standard `AWS_*` env vars). The server's `--allowed-hosts` — the Host headers it accepts, i.e. its DNS-rebinding protection — is configurable via `MLFLOW_ALLOWED_HOSTS`: default = the previous pinned list plus `localhost:*` / `127.0.0.1:*` (any loopback port, so the UI also works on a random published port); behind a reverse proxy or on a differently published port, set the exact `host[:port]` the UI is reached at (e.g. `mlflow.example.com:8443`). A bare `*` must never be set — it allows all hosts and disables the protection. Job containers only need the tracking URI | **5000** |
 | `qdrant` | Vector database for kNN retrieval; state in the `qdrant-storage` volume | **6333** (HTTP) / **6334** (gRPC) |
 | `triton` | Inference server (CPU-only ONNX Runtime backend, `26.07-py3` image variant); model repository is the project dir `triton-models/` bind-mounted at `/models` in the service *and* in every job container (26.x layout: `config.pbtxt` at the model root, model file under `<name>/1/`; model control via gRPC because the 26.07 HTTP load endpoint is broken) | **8000** (gRPC) / **8005** (HTTP) / **8006** (metrics) |
 
@@ -222,6 +222,7 @@ DAG_ID=ml_platform_pipeline make runinfo
 | `QDRANT_URL` / `QDRANT_COLLECTION` / `QDRANT_DISTANCE` | Qdrant endpoint / collection / match type (`cosine`\|`euclidean`\|`dot`\|`manhattan`) | `http://qdrant:6333` / `feature_vectors` / `cosine` |
 | `TRITON_HTTP_URL` / `TRITON_GRPC_URL` / `TRITON_MODEL_NAME` | Triton endpoints + deployed model name | `http://triton:8005` / `triton:8000` / `linreg_onnx` |
 | `MLFLOW_TRACKING_URI` | MLflow tracking endpoint (artifact proxy is on by default — jobs only need this) | `http://mlflow:5000` |
+| `MLFLOW_ALLOWED_HOSTS` | Comma-separated Host headers the MLflow server accepts (DNS-rebinding protection); default = the previous pinned list + any port on localhost/127.0.0.1; for a reverse proxy or a differently published UI port set the exact `host[:port]` the UI is reached at (e.g. `mlflow.example.com:8443`); a bare `*` disables the protection and must never be set | `mlflow:5000,localhost:5000,127.0.0.1:5000,localhost,127.0.0.1,localhost:*,127.0.0.1:*` |
 
 ## Going to real AWS (or other S3)
 
