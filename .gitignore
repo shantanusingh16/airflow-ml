@@ -225,3 +225,12 @@ __marimo__/
 
 # Triton models
 triton-models/
+
+# voc12 demo video projects: renders, assets, audio and HyperFrames caches never enter git
+video/**/renders/
+video/**/assets/
+video/**/frames/
+video/**/.hyperframes/
+video/final/**/renders/
+video/final/audio/
+video/**/*.wav

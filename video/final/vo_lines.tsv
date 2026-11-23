@@ -1,0 +1,14 @@
+# id	global_start_s	line (verbatim: v2 storyboard VO + operator final-copy overrides, t_31cfb2ff 2026-11-23)
+I1	0.4	Meet airflow-ml. In the next two minutes: one raw dataset in — duplicate-checked, split-ready data out, on one platform.
+A1	10.4	One trigger starts it all: voc12_demo on a 1,000-image sample of PASCAL VOC 2012.
+A3	19.4	On the Grid, one row per run — one cell per task.
+A2	25.4	The upload job lands the sample in MinIO — images and annotations, in the standard VOC layout.
+B1	35.4	First checkpoint: verify_upload confirms every image has its annotation.
+B2	43.9	Every count lands in the task log — pairs uploaded, images verified.
+B3	56.4	Next, ingest_voc12 loads the verified sample into the dataset.
+C1	65.4	Now dedup: embed_fastdup turns each image into an embedding, then groups the near-duplicates.
+C2	75.4	Dedup publishes a report with the run — stored under the run's prefix, right next to the data.
+C3	84.4	The near-duplicate table, straight from the report.
+D1	93.1	Last step: cluster_split groups the images, then splits each cluster across train, val, and test — near-duplicates are flagged, and every split stays cluster-aware.
+D2	105.6	Five tasks, all green — raw sample in, split-ready dataset out, on one platform.
+O1	116.1	That's airflow-ml: raw dataset in, duplicate-checked and split-ready out. Bring your dataset — leave with split-ready train/val/test.

@@ -1,0 +1,60 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .d1-chip {
+      position: absolute; left: 1500px; top: 66px; height: 40px; padding: 0 18px;
+      display: flex; align-items: center; gap: 10px; border-radius: 20px;
+      background: rgba(17, 24, 39, 0.9); color: #fff; font-size: 20px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .d1-chip i { width: 8px; height: 8px; border-radius: 4px; background: #f59f00; display: block; }
+    .d1-co { position: absolute; inset: 0; }
+    .d1-co .ln { position: absolute; background: #d6336c; }
+    .d1-co .lbl {
+      position: absolute; height: 36px; padding: 0 14px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 20px; font-weight: 700; white-space: nowrap;
+    }
+    .d1-co .dot { position: absolute; width: 0; height: 0; border-style: solid; }
+  </style>
+  <div id="root" data-composition-id="d1" data-width="1920" data-height="1080">
+    <div id="d1-chip" class="clip" data-start="0" data-duration="12.5" data-track-index="0">
+      <div class="d1-chip"><i></i><span data-var-text="d1Chip">D1 · Cluster split</span></div>
+    </div>
+
+    <!-- Callout A: L25 "clustering done in 0.3s: 20 clusters, 0 noise points reassigned"
+         glyph rows y 669–680, text ends x 1189. Marker + pointer stay inside L25's own row band
+         (x ≥ 1198), so L24 (the KMeans-fallback warning, y 651–662) is never touched. -->
+    <div id="d1-co-clusters" class="clip" data-start="0.8" data-duration="11.4" data-track-index="1">
+      <div class="d1-co" id="d1-co-a">
+        <div class="ln" style="left:1198px; top:668px; width:3px; height:14px"></div>
+        <div class="ln a-ptr" style="left:1201px; top:674px; width:316px; height:2px; transform-origin:0 50%"></div>
+        <div class="lbl" style="left:1520px; top:658px">Cluster count</div>
+      </div>
+    </div>
+
+    <!-- Callout B: L27–L29 train/val/test rows, glyph rows y 705–752, text ends x 1094.
+         Bracket at x 1104–1110 right of the rows; pointer to the label in the empty right zone. -->
+    <div id="d1-co-splits" class="clip" data-start="1.6" data-duration="10.6" data-track-index="2">
+      <div class="d1-co" id="d1-co-b">
+        <div class="ln" style="left:1102px; top:704px; width:10px; height:2px"></div>
+        <div class="ln" style="left:1110px; top:704px; width:2px; height:50px"></div>
+        <div class="ln" style="left:1102px; top:752px; width:10px; height:2px"></div>
+        <div class="ln b-ptr" style="left:1112px; top:728px; width:405px; height:2px; transform-origin:0 50%"></div>
+        <div class="lbl" style="left:1520px; top:712px">Split counts · train / val / test</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#d1-chip .d1-chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.1);
+    tl.fromTo("#d1-co-a", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.8);
+    tl.fromTo("#d1-co-a .a-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.8);
+    tl.fromTo("#d1-co-b", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 1.6);
+    tl.fromTo("#d1-co-b .b-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, 1.6);
+    // out before the cut at 12.5 s
+    tl.to(["#d1-co-a", "#d1-co-b"], { opacity: 0, duration: 0.3, ease: "power2.in" }, 11.8);
+    tl.to("#d1-chip .d1-chip", { opacity: 0, duration: 0.2, ease: "power2.in" }, 12.25);
+    window.__timelines["d1"] = tl;
+  </script>
+</template>

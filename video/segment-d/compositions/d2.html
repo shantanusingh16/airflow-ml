@@ -1,0 +1,54 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .d2-chip {
+      position: absolute; left: 1500px; top: 66px; height: 40px; padding: 0 18px;
+      display: flex; align-items: center; gap: 10px; border-radius: 20px;
+      background: rgba(17, 24, 39, 0.9); color: #fff; font-size: 20px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .d2-chip i { width: 8px; height: 8px; border-radius: 4px; background: #40c057; display: block; }
+    .d2-co { position: absolute; inset: 0; }
+    .d2-co .box { position: absolute; border: 2px solid #d6336c; border-radius: 8px; }
+    .d2-co .ln { position: absolute; background: #d6336c; }
+    .d2-co .lbl {
+      position: absolute; height: 36px; padding: 0 14px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 20px; font-weight: 700; white-space: nowrap; transform: translateX(-50%);
+    }
+  </style>
+  <div id="root" data-composition-id="d2" data-width="1920" data-height="1080">
+    <div id="d2-chip" class="clip" data-start="0" data-duration="10.566667" data-track-index="0">
+      <div class="d2-chip"><i></i><span data-var-text="d2Chip">D2 · Run complete</span></div>
+    </div>
+
+    <!-- Runs-table row (y 334–390). Success badge glyphs x 854–940, y 349–374 → box 844–950 × 340–383.
+         Neighbours: Run After text ends x 797, Run Type ▸ starts x 961. -->
+    <div id="d2-co-state" class="clip" data-start="0.8" data-duration="9.766667" data-track-index="1">
+      <div class="d2-co" id="d2-co-a">
+        <div class="box" style="left:844px; top:340px; width:106px; height:43px"></div>
+        <div class="ln a-ptr" style="left:896px; top:383px; width:2px; height:62px; transform-origin:50% 0"></div>
+        <div class="lbl" style="left:897px; top:445px">Run state</div>
+      </div>
+    </div>
+
+    <!-- Duration cell "00:17:02" glyphs x 1286–1339, y 357–366 → box 1274–1351 × 345–378.
+         Neighbours: Start Date text ends x 1223, Dag Version "v1" starts x 1409. -->
+    <div id="d2-co-dur" class="clip" data-start="1.4" data-duration="9.166667" data-track-index="2">
+      <div class="d2-co" id="d2-co-b">
+        <div class="box" style="left:1274px; top:345px; width:77px; height:33px"></div>
+        <div class="ln b-ptr" style="left:1312px; top:378px; width:2px; height:67px; transform-origin:50% 0"></div>
+        <div class="lbl" style="left:1313px; top:445px">Run duration</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#d2-chip .d2-chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.35);
+    tl.fromTo("#d2-co-a", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.8);
+    tl.fromTo("#d2-co-a .a-ptr", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power2.out" }, 0.8);
+    tl.fromTo("#d2-co-b", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 1.4);
+    tl.fromTo("#d2-co-b .b-ptr", { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: "power2.out" }, 1.4);
+    window.__timelines["d2"] = tl;
+  </script>
+</template>

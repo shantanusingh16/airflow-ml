@@ -1,0 +1,37 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .cap {
+      position: absolute; left: 50%; top: 884px; transform: translateX(-50%);
+      min-width: 760px; padding: 14px 40px 16px; border-radius: 14px;
+      background: rgba(17, 24, 39, 0.9); color: #fff; text-align: center; white-space: nowrap;
+    }
+    .cap .l1 { font-size: 34px; font-weight: 700; line-height: 42px; }
+    .cap .l2 { font-size: 28px; font-weight: 400; line-height: 36px; color: #dee2e6; }
+    /* D2 line 2 (CF-1 softened copy) is longer: minimal font step-down so the bar keeps its 760 px width. */
+    #cap-d2 .cap .l2 { font-size: 27px; letter-spacing: -0.1px; }
+  </style>
+  <div id="root" data-composition-id="captions" data-width="1920" data-height="1080">
+    <!-- D1 copy (v2): {n_clusters}=clusters=20; {n_train}/{n_val}/{n_test}=split.*.count=701/101/198;
+         (70/10/20) = on-screen target ratios. -->
+    <div id="cap-d1" class="clip" data-start="0" data-duration="12.5" data-track-index="0">
+      <div class="cap">
+        <div class="l1" data-var-text="capD1L1">20 clusters</div>
+        <div class="l2" data-var-text="capD1L2">train 701 · val 101 · test 198 (70/10/20)</div>
+      </div>
+    </div>
+    <!-- D2 copy (v2): {n_total}=n_embeddings=1000. -->
+    <div id="cap-d2" class="clip" data-start="12.5" data-duration="10.566667" data-track-index="0">
+      <div class="cap">
+        <div class="l1" data-var-text="capD2L1">voc12_demo complete</div>
+        <div class="l2" data-var-text="capD2L2">1000 images, near-dup-checked, cluster-aware splits</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#cap-d1 .cap", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+    tl.fromTo("#cap-d2 .cap", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 12.5);
+    window.__timelines["captions"] = tl;
+  </script>
+</template>

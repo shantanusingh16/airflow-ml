@@ -1,0 +1,47 @@
+{
+  "clusters": 20,
+  "clustering_note": "warning: DBSCAN found no dense cluster (all noise) — falling back to KMeans(20) on normalized embeddings",
+  "dbscan_eps": 0.15,
+  "dbscan_min_samples": 5,
+  "split.train.count": 701,
+  "split.val.count": 101,
+  "split.test.count": 198,
+  "split.train.achieved_pct": 70.1,
+  "split.val.achieved_pct": 10.1,
+  "split.test.achieved_pct": 19.8,
+  "split.train.target_pct": 70,
+  "split.val.target_pct": 10,
+  "split.test.target_pct": 20,
+  "n_embeddings": 1000,
+  "run_id": "manual__2026-11-23T01:00:57.988475+00:00",
+  "run_state": "success",
+  "grid_task_states": null,
+  "extras": {
+    "embedding_dim": 576,
+    "clustering_time_s": 0.3,
+    "noise_points_reassigned": 0,
+    "kmeans_fallback_k": 20,
+    "run_duration": "00:17:02",
+    "task_finished_s": 218.5
+  },
+  "where": {
+    "clusters": "D1: Pre Execute log line 25 \"clustering done in 0.3s: 20 clusters, 0 noise points reassigned\"",
+    "clustering_note": "D1: Pre Execute log line 24 (warning line; held in frame, not scrolled past)",
+    "dbscan_eps": "D1: log line 23 \"(DBSCAN eps=0.15, min_samples=5)\"",
+    "dbscan_min_samples": "D1: log line 23",
+    "split.train.count": "D1: log line 27 \"train: 701 images (70.1% of 1000; target 70%)\"",
+    "split.val.count": "D1: log line 28 \"val: 101 images (10.1% of 1000; target 10%)\"",
+    "split.test.count": "D1: log line 29 \"test: 198 images (19.8% of 1000; target 20%)\"",
+    "split.*.achieved_pct": "D1: log lines 27-29 \"(…% of 1000; …)\"",
+    "split.*.target_pct": "D1: log lines 27-29 \"target …%\"",
+    "n_embeddings": "D1: log line 23 \"clustering 1000 x 576 …\" and lines 27-29 \"… of 1000 …\"",
+    "run_id": "D2: Runs-table row, DAG Run ID cell",
+    "run_state": "D2: Runs-table row State cell (Success badge)",
+    "grid_task_states": "NOT OBSERVED: the Grid view mode did not render the run row / task cells in this environment (see notes)",
+    "extras.run_duration": "D2: Runs-table row Duration cell"
+  },
+  "notes": {
+    "grid_task_states": "The Grid view (\"Show Grid (Press g)\" toolbar toggle / \"g\" key) was activated in both /dags/voc12_demo and /dags/voc12_demo/runs, but over 90s no run row or task cells rendered: zero WebSocket connections opened, no grid-data REST calls fired (REST dagRuns/taskInstances state=failed sidebar calls did), and the green-pixel map of the grid area is empty compared to the capture-1 reference (screen-03). D2 therefore shows the equivalent run row on the Runs table: full run id, State=Success, Duration 00:17:02. The five per-task green cells were never visible in this window, so grid_task_states is null.",
+    "d1_log_lines": "On-screen log lines carry the \"[2026-11-23 01:14:22] INFO - \" timestamp/level prefix; the train/val/test rows are column-padded (\"val  :\" / \"test :\"). Content matches the spec exactly."
+  }
+}
