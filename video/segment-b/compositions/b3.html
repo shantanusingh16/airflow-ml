@@ -1,0 +1,60 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .chip {
+      position: absolute; right: 150px; top: 68px; height: 38px; padding: 0 16px;
+      display: flex; align-items: center; gap: 10px; border-radius: 19px;
+      background: rgba(17, 24, 39, 0.92); color: #fff; font-size: 19px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .chip i { width: 8px; height: 8px; border-radius: 4px; background: #d6336c; display: block; }
+    .co { position: absolute; inset: 0; }
+    .co .box { position: absolute; border: 2px solid #d6336c; border-radius: 3px; }
+    .co .ln { position: absolute; background: #d6336c; }
+    .co .lbl {
+      position: absolute; height: 30px; padding: 0 12px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 18px; font-weight: 700; white-space: nowrap;
+    }
+  </style>
+  <div id="root" data-composition-id="b3" data-width="1920" data-height="1080">
+    <!-- local t = abs t − 17.6 -->
+    <div id="b3-chip" class="clip" data-start="0" data-duration="12.466667" data-track-index="0">
+      <div class="chip"><i></i><span data-var-text="b3Chip">B3 · Ingest</span></div>
+    </div>
+
+    <!-- B3a callout: the green ingest_voc12 cell (badge x 407–420, y 296–309; verify cell ends y 289;
+         tooltip arrow starts y 313 during 19.8–22.87 s abs). Box borders in the gaps (y 291–292, 310–311).
+         Grid fully rendered by 18.6 s abs → in at local 1.1 (18.7 abs), out before the cut at 22.867 abs. -->
+    <div id="b3-co-cell" class="clip" data-start="1.1" data-duration="4.1" data-track-index="1">
+      <div class="co" id="b3a-co">
+        <div class="box" style="left:397px; top:291px; width:29px; height:21px"></div>
+        <div class="ln" style="left:397px; top:226px; width:2px; height:66px"></div>
+        <div class="ln b3a-ptr" style="left:334px; top:226px; width:65px; height:2px; transform-origin:100% 50%"></div>
+        <div class="lbl" style="right:1586px; top:211px">ingest_voc12 · success</div>
+      </div>
+    </div>
+
+    <!-- B3b callout: ingest_voc12 log L17 "INGEST OK: …" (static hold from 24.367 s abs = local 6.767).
+         Glyph rows: L15 (DeepLake commit) 633–644 — untouched; L16 651–662 (ends x 1527);
+         L17 669–680 (ends x 1397); L18 687–698. Box borders in the gaps: y 665–666 / 683–684,
+         x 493–494 / 1405–1406. Label at x ≥ 1545 (right of L16's end), y 661–689. -->
+    <div id="b3-co-line" class="clip" data-start="6.9" data-duration="5.566667" data-track-index="1">
+      <div class="co" id="b3b-co">
+        <div class="box" style="left:493px; top:665px; width:914px; height:20px"></div>
+        <div class="ln b3b-ptr" style="left:1407px; top:674px; width:138px; height:2px; transform-origin:0 50%"></div>
+        <div class="lbl" style="left:1545px; top:660px">ingest result → DeepLake</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#b3-chip .chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.1);
+    tl.fromTo("#b3a-co", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 1.1);
+    tl.fromTo("#b3a-co .b3a-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, 1.1);
+    tl.to("#b3a-co", { opacity: 0, duration: 0.25, ease: "power2.in" }, 4.9);
+    tl.fromTo("#b3b-co", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 6.9);
+    tl.fromTo("#b3b-co .b3b-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, 7.0);
+    window.__timelines["b3"] = tl;
+  </script>
+</template>

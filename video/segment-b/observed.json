@@ -1,0 +1,80 @@
+{
+  "dag_id": "voc12_demo",
+  "run_id": "manual__2026-11-23T01:00:57.988475+00:00",
+  "run_state": "Success",
+  "run_duration": "00:17:02",
+  "grid_task_states": {
+    "upload_voc12": "success",
+    "verify_upload": "success",
+    "ingest_voc12": "success",
+    "embed_fastdup": "success",
+    "cluster_split": "success"
+  },
+  "objects_total": 2001,
+  "jpegs": 1000,
+  "xmls": 1000,
+  "trainval_image_refs": 1000,
+  "images_verified": 1000,
+  "annotations_verified": 1000,
+  "verify_prefix": "s3://ml-artifacts/datasets/voc12/VOC2012/",
+  "annotation_files_found": 1000,
+  "annotation_prefix": "s3://ml-artifacts/datasets/voc12/VOC2012/Annotations/",
+  "images_ingested": 1000,
+  "boxes_ingested": 1628,
+  "deeplake_dataset": "s3://ml-artifacts/deeplake/voc12",
+  "deeplake_commit": "firstdbf9474",
+  "clip": "/work/out/segment-b.mp4",
+  "clip_seconds": 30.09,
+  "where": {
+    "objects_total": "B2: verify_upload log, Pre Execute L11 \"datasets/voc12/VOC2012/: 2001 objects, 1000 JPEGs, 1000 XMLs\"",
+    "jpegs": "B2: same line (L11)",
+    "xmls": "B2: same line (L11)",
+    "trainval_image_refs": "B2: Pre Execute L12 \"trainval.txt: 1000 image refs\"",
+    "images_verified": "B2: Pre Execute L13 \"UPLOAD OK: 1000 images + 1000 annotations verified in s3://ml-artifacts/datasets/voc12/VOC2012/\"",
+    "annotations_verified": "B2: L13 (same line)",
+    "verify_prefix": "B2: L13 (s3://ml-artifacts/datasets/voc12/VOC2012/)",
+    "annotation_files_found": "B3b: ingest_voc12 log, Pre Execute L13 \"found 1000 annotation files under s3://\u2026/Annotations/\"",
+    "annotation_prefix": "B3b: L13 (s3://ml-artifacts/datasets/voc12/VOC2012/Annotations/)",
+    "images_ingested": "B3b: Pre Execute L17 \"INGEST OK: 1000 images, 1628 boxes \u2192 s3://ml-artifacts/deeplake/voc12 (commit firstdbf9474)\"",
+    "boxes_ingested": "B3b: L17 (same line)",
+    "deeplake_dataset": "B3b: L14 \"s3://ml-artifacts/deeplake/voc12 loaded successfully.\" (also L17)",
+    "deeplake_commit": "B3b: L15 \"DeepLake commit firstdbf9474 \u2026\" and L17 \"(commit firstdbf9474)\"",
+    "run_state": "B1/B3a: DAG header \"Latest Run 2026-11-23 01:00:57\" with green success check; grid run column with 5 green success cells; B1 hover tooltip \"State: Success\" (task-level)",
+    "run_duration": "B1/B3a: grid duration axis label \"00:17:02\" at the top of the run bar",
+    "run_id": "B1: verify_upload cell hover tooltip \"Run ID: manual__2026-11-23T01:00:57.988475+00:00\" (also B3a ingest_voc12 tooltip)",
+    "grid_task_states": "B1/B3a: grid run column, one green success badge per task row (upload_voc12, verify_upload, ingest_voc12, embed_fastdup, cluster_split); state read from each cell tooltip \"State: Success\""
+  },
+  "notes": {
+    "grid": "Grid rendered on /dags/voc12_demo after 2.5s; B1 cursor on the verify_upload cell (tooltip State: Success), B3a cursor on the ingest_voc12 cell. The documented Grid WS outage did not reproduce: grid data loaded via the REST /ui/grid/* endpoints.",
+    "scroll": "No scrolling was needed or performed: on load (after expanding the Pre Execute section) the required lines were already in frame for both log shots; both holds are fully static.",
+    "source_url_line": "The lazily-rendered source-URL line carrying the internal hostname (http://airflow-worker:8793/log/\u2026) never appeared in either log view: absent after the 12 s lazy-render window in the off-take probe and re-checked at settle and hold end on camera. Nothing to cover.",
+    "lazy_check": "Line positions were verified twice per log shot (at hold start and hold end) via bounding boxes.",
+    "timeline": "Shot boundaries from the capture log + ffmpeg freezedetect (static spans 9.13-17.60 s and 24.37-30.07 s are the B2/B3b log holds; no UI scrolling inside any hold)."
+  },
+  "timeline_s": {
+    "B1_grid_verify_upload": [
+      0.0,
+      7.6
+    ],
+    "B1_to_B2_transition": [
+      7.6,
+      9.1
+    ],
+    "B2_verify_log_hold": [
+      9.1,
+      17.6
+    ],
+    "B3a_grid_ingest_voc12": [
+      17.6,
+      22.9
+    ],
+    "B3_to_log_transition": [
+      22.9,
+      24.4
+    ],
+    "B3b_ingest_log_hold": [
+      24.4,
+      30.07
+    ]
+  }
+}
