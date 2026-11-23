@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <!-- Segment C (voc12_demo, DEDUPLICATE): overlays only, composited over the untouched QA clip.
+         Numbers: observed.json only (dup_groups=1, run_id). Silent: the clip has no audio and stays muted. -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      #base { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: contain; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="27.7"
+         data-width="1920" data-height="1080">
+      <!-- Base: segment-c.mp4 (sha256 8810b1eb…1e0f), 831 frames, full length, 1:1, no trim / rate change / crop. -->
+      <video id="base" class="clip" src="assets/segment-c.mp4" muted playsinline
+             data-start="0" data-duration="27.7" data-track-index="0" style="z-index:1"></video>
+
+      <!-- C1 (C1a+C1b): 0 → 9.8 s (cuts measured: C1a→C1b frame 106 = 3.533 s; C1→C2 frame 294 = 9.8 s) -->
+      <div id="c1" data-composition-id="c1" data-composition-src="compositions/c1.html"
+           data-start="0" data-duration="9.8" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:2"></div>
+
+      <!-- C2: 9.8 → 18.533 s (C2→C3 cut frame 556 = 18.533 s) -->
+      <div id="c2" data-composition-id="c2" data-composition-src="compositions/c2.html"
+           data-start="9.8" data-duration="8.733333" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:3"></div>
+
+      <!-- C3: 18.533 s → end (chip only; no callout) -->
+      <div id="c3" data-composition-id="c3" data-composition-src="compositions/c3.html"
+           data-start="18.533333" data-duration="9.166667" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:4"></div>
+
+      <!-- Caption bar, always on: one host holds all three caption groups -->
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html"
+           data-start="0" data-duration="27.7" data-track-index="2" data-track-kind="captions"
+           data-width="1920" data-height="1080" style="z-index:5"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

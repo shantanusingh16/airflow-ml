@@ -1,0 +1,33 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .chip {
+      position: absolute; height: 40px; padding: 0 18px;
+      display: flex; align-items: center; gap: 10px; border-radius: 20px;
+      background: rgba(17, 24, 39, 0.9); color: #fff; font-size: 20px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .chip i { width: 8px; height: 8px; border-radius: 4px; background: #f59f00; display: block; }
+    .co { position: absolute; inset: 0; }
+    .co .box { position: absolute; border: 2px solid #d6336c; border-radius: 3px; }
+    .co .ln { position: absolute; background: #d6336c; }
+    .co .lbl {
+      position: absolute; height: 34px; padding: 0 12px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 18px; font-weight: 700; white-space: nowrap;
+    }
+    #c3-chip .chip { right: 120px; top: 54px; }
+  </style>
+  <div id="root" data-composition-id="c3" data-width="1920" data-height="1080">
+    <!-- Chip: preview dialog header, right of the title (ends x 1012), left of the close X (x ≥ 1838).
+         No callout in C3: the report pages stay clean. -->
+    <div id="c3-chip" class="clip" data-start="0" data-duration="9.166667" data-track-index="0">
+      <div class="chip"><i></i><span data-var-text="c3Chip">C3 · Dedup report</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#c3-chip .chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.1);
+    window.__timelines["c3"] = tl;
+  </script>
+</template>
