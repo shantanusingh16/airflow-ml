@@ -1,0 +1,90 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+    }
+    .chip {
+      position: absolute;
+      top: 196px;
+      right: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: rgba(10, 12, 17, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .chip .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+    }
+    .co-box {
+      position: absolute;
+      border: 2px solid #ffb224;
+      border-radius: 6px;
+      background: rgba(255, 178, 36, 0.05);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22);
+    }
+    .co-label {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 13px;
+      border-radius: 7px;
+      white-space: nowrap;
+      background: rgba(11, 13, 18, 0.94);
+      border: 1px solid #ffb224;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #ffd47e;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+  <div id="root" data-composition-id="a3" data-width="1920" data-height="1080">
+    <!-- A3 · Grid view (local 0-6 s = global 9-15 s, static hold).
+         Airflow 3 grid: per-run columns with state badges. The run column is a green
+         bar (x≈588-603, y≈225-352) with a manual-run icon and start-time label "01:00:57"
+         (x≈710-790); task names sit in the left list (x≈84-179, y≈259-352). -->
+    <div id="chip-a3" class="clip" data-start="0" data-duration="6" data-track-index="2">
+      <div class="chip"><span class="dot"></span>A3 · Grid view</div>
+    </div>
+    <!-- Run column: icon + start-time label + its 5 green state-badge cells -->
+    <div id="co-a3-run" class="clip" data-start="0" data-duration="6" data-track-index="3">
+      <div class="co-box" style="left: 555px; top: 218px; width: 255px; height: 142px;"></div>
+      <div class="co-label" style="left: 560px; top: 368px;">run · all tasks green</div>
+    </div>
+    <!-- Left panel listing the task names -->
+    <div id="co-a3-panel" class="clip" data-start="0" data-duration="6" data-track-index="3">
+      <div class="co-box" style="left: 68px; top: 250px; width: 192px; height: 110px;"></div>
+      <div class="co-label" style="left: 70px; top: 222px;">task names</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#chip-a3 .chip", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 0.1);
+    tl.to("#chip-a3 .chip", { opacity: 0, duration: 0.2, ease: "power2.in" }, 5.78);
+    const cos = [
+      ["#co-a3-run", 0.2, 5.9],
+      ["#co-a3-panel", 0.3, 5.9],
+    ];
+    cos.forEach(([sel, s, e]) => {
+      tl.fromTo(sel + " .co-box", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, s);
+      tl.fromTo(sel + " .co-label", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, s + 0.08);
+      tl.to(sel + " .co-box", { opacity: 0, duration: 0.18, ease: "power2.in" }, e - 0.18);
+      tl.to(sel + " .co-label", { opacity: 0, duration: 0.16, ease: "power2.in" }, e - 0.16);
+    });
+    window.__timelines["a3"] = tl;
+  </script>
+</template>

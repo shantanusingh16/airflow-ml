@@ -1,0 +1,23 @@
+{
+  "dag": "voc12_demo",
+  "dag_tags": ["demo", "voc12"],
+  "run_id": "manual__2026-11-23T01:00:57.988475+00:00",
+  "run_state": "success",
+  "run_duration": "00:17:02",
+  "conf": {"SAMPLE": 1000},
+  "conf.SAMPLE": 1000,
+  "pairs_uploaded": 1000,
+  "jpeg_uploaded": 1000,
+  "xml_uploaded": 1000,
+  "jpeg_skipped": 0,
+  "xml_skipped": 0,
+  "annotated_pairs_total": 5138,
+  "trainval_ids": 1000,
+  "trainval_key": "s3://ml-artifacts/datasets/voc12/VOC2012/ImageSets/Main/trainval.txt",
+  "upload_duration_s": 36.7,
+  "prefix_folders": 3,
+  "prefix_folder_names": ["Annotations", "ImageSets", "JPEGImages"],
+  "bucket_objects": 2734,
+  "bucket_size": "113.8 MiB",
+  "_updated": "2026-11-23T05:53:36.784Z"
+}

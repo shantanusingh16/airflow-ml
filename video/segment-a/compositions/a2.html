@@ -1,0 +1,60 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+    }
+    .co-box {
+      position: absolute;
+      border: 2px solid #ffb224;
+      border-radius: 6px;
+      background: rgba(255, 178, 36, 0.05);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22);
+    }
+    .co-label {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 13px;
+      border-radius: 7px;
+      white-space: nowrap;
+      background: rgba(11, 13, 18, 0.94);
+      border: 1px solid #ffb224;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #ffd47e;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+  <div id="root" data-composition-id="a2" data-width="1920" data-height="1080">
+    <!-- A2 · Upload in MinIO, log half (local 0-5 s = global 15-20 s).
+         Log viewer pane x≈660-1900; key lines (static once rendered at ~15.6 s):
+         SAMPLE line y≈417-429, UPLOAD OK line y≈453-465.
+         Labels sit in the empty left zone (x≈110-640) to keep every log line visible. -->
+    <!-- SAMPLE=1000: first 1000 of 5138 annotated pairs -->
+    <div id="co-a2-sample" class="clip" data-start="0.6" data-duration="4.4" data-track-index="3">
+      <div class="co-box" style="left: 670px; top: 411px; width: 1200px; height: 26px;"></div>
+      <div class="co-label" style="left: 140px; top: 413px;">SAMPLE line</div>
+    </div>
+    <!-- UPLOAD OK: 1000 pairs ... (JPEG 1000 uploaded / 0 skipped, XML 1000 uploaded / 0 skipped) -->
+    <div id="co-a2-uploadok" class="clip" data-start="0.6" data-duration="4.4" data-track-index="3">
+      <div class="co-box" style="left: 670px; top: 447px; width: 1204px; height: 26px;"></div>
+      <div class="co-label" style="left: 140px; top: 453px;">UPLOAD OK line</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const cos = [
+      ["#co-a2-sample", 0.62, 4.95],
+      ["#co-a2-uploadok", 0.62, 4.95],
+    ];
+    cos.forEach(([sel, s, e]) => {
+      tl.fromTo(sel + " .co-box", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power2.out" }, s);
+      tl.fromTo(sel + " .co-label", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, s + 0.07);
+      tl.to(sel + " .co-box", { opacity: 0, duration: 0.16, ease: "power2.in" }, e - 0.16);
+      tl.to(sel + " .co-label", { opacity: 0, duration: 0.14, ease: "power2.in" }, e - 0.14);
+    });
+    window.__timelines["a2"] = tl;
+  </script>
+</template>

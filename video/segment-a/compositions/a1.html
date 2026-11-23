@@ -1,0 +1,90 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+    }
+    .chip {
+      position: absolute;
+      top: 196px;
+      right: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: rgba(10, 12, 17, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .chip .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+    }
+    .co-box {
+      position: absolute;
+      border: 2px solid #ffb224;
+      border-radius: 6px;
+      background: rgba(255, 178, 36, 0.05);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22);
+    }
+    .co-label {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 13px;
+      border-radius: 7px;
+      white-space: nowrap;
+      background: rgba(11, 13, 18, 0.94);
+      border: 1px solid #ffb224;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #ffd47e;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+  <div id="root" data-composition-id="a1" data-width="1920" data-height="1080">
+    <!-- A1 · Trigger (0-9 s): Dags list -> DAG page -> Runs list -> run page -> Details panel.
+         All coordinates from frame analysis of the captured clip (1920x1080). -->
+    <div id="chip-a1" class="clip" data-start="0" data-duration="9" data-track-index="2">
+      <div class="chip"><span class="dot"></span>A1 · Trigger</div>
+    </div>
+    <!-- voc12_demo row in the Dags list (row visible 0 -> ~0.9 s, then row click) -->
+    <div id="co-a1-row" class="clip" data-start="0" data-duration="0.95" data-track-index="3">
+      <div class="co-box" style="left: 118px; top: 300px; width: 1782px; height: 68px;"></div>
+      <div class="co-label" style="left: 120px; top: 374px;">voc12_demo · DAG row</div>
+    </div>
+    <!-- Conf entry in the Details panel (left-sidebar tab, Airflow 3).
+         The panel's bottom row "Conf {"SAMPLE": 1000}" sits at x≈728-1120, y≈1008-1022
+         (verified in-frame at 8.5 s); the box frames that entry. -->
+    <div id="co-a1-conf" class="clip" data-start="7.2" data-duration="1.8" data-track-index="3">
+      <div class="co-box" style="left: 716px; top: 1000px; width: 416px; height: 30px;"></div>
+      <div class="co-label" style="left: 720px; top: 966px;">Conf entry (SAMPLE)</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#chip-a1 .chip", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 0.1);
+    tl.to("#chip-a1 .chip", { opacity: 0, duration: 0.2, ease: "power2.in" }, 8.78);
+    const cos = [
+      ["#co-a1-row", 0.04, 0.95],
+      ["#co-a1-conf", 7.25, 9.0],
+    ];
+    cos.forEach(([sel, s, e]) => {
+      tl.fromTo(sel + " .co-box", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.2, ease: "power2.out" }, s);
+      tl.fromTo(sel + " .co-label", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, s + 0.07);
+      tl.to(sel + " .co-box", { opacity: 0, duration: 0.16, ease: "power2.in" }, e - 0.16);
+      tl.to(sel + " .co-label", { opacity: 0, duration: 0.14, ease: "power2.in" }, e - 0.14);
+    });
+    window.__timelines["a1"] = tl;
+  </script>
+</template>

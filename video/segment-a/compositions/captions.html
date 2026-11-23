@@ -1,0 +1,83 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+    }
+    /* Caption bar: bottom-RIGHT anchor so it clears the A1 Details "Conf" row
+       (x≈728-1120, y≈1008-1022 at frame bottom) and the MinIO left-panel
+       footer/sign-out (x<430, y>880). Verified empty x≈1310-1884, y≈949-1050
+       in all six UI states. Position is constant across all three shots. */
+    .capbar {
+      position: absolute;
+      right: 36px;
+      bottom: 30px;
+      padding: 13px 40px 15px;
+      border-radius: 12px;
+      background: rgba(9, 11, 16, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 4px;
+    }
+    .cap-line1 {
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      color: #f4f6fb;
+      white-space: nowrap;
+    }
+    .cap-line2 {
+      font-family: "Inter", sans-serif;
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 1.25;
+      color: #b9c2d4;
+      white-space: nowrap;
+    }
+    .cap-mono {
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 500;
+    }
+  </style>
+  <div id="root" data-composition-id="captions" data-width="1920" data-height="1080">
+    <!-- A1 (0-9s). Line 2 is the on-screen conf literal (config, not an observed result). -->
+    <div id="cap-a1" class="clip" data-start="0" data-duration="9" data-track-index="1">
+      <div class="capbar">
+        <div class="cap-line1">Trigger: voc12_demo</div>
+        <div class="cap-line2"><span class="cap-mono">conf {"SAMPLE": 1000}</span></div>
+      </div>
+    </div>
+    <!-- A3 (9-15s). Grid = per-run columns with state badges (Airflow 3). -->
+    <div id="cap-a3" class="clip" data-start="9" data-duration="6" data-track-index="1">
+      <div class="capbar">
+        <div class="cap-line1">Grid view</div>
+        <div class="cap-line2">one row per run, one cell per task</div>
+      </div>
+    </div>
+    <!-- A2 (15-25s). "1000" = jpeg_uploaded from observed.json. -->
+    <div id="cap-a2" class="clip" data-start="15" data-duration="9.967" data-track-index="1">
+      <div class="capbar">
+        <div class="cap-line1"><span class="cap-mono">MinIO · datasets/voc12/VOC2012/</span></div>
+        <div class="cap-line2">1000 JPEGs · annotations</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    [
+      ["#cap-a1", 0, 9],
+      ["#cap-a3", 9, 15],
+      ["#cap-a2", 15, 24.967],
+    ].forEach(([sel, s, e]) => {
+      tl.fromTo(sel + " .capbar", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.26, ease: "power2.out" }, s + 0.05);
+      tl.to(sel + " .capbar", { opacity: 0, duration: 0.2, ease: "power2.in" }, e - 0.2);
+    });
+    window.__timelines["captions"] = tl;
+  </script>
+</template>
