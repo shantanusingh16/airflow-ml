@@ -230,22 +230,7 @@ Segment C is composed and rendered. The output is a silent MP4 of 27.70 s and 83
 ```json
 {
   "argv0": "/home/dev-runner/.local/bin/claude",
-  "artifacts": [
-    {
-      "attachable": true,
-      "path": "video/segment-c/assets/segment-c.mp4",
-      "sha256": "8810b1eb14a770bb3f61e238e2783511664957ad9a7ef4d2417a60cdf45d1e0f",
-      "size": 1104897,
-      "stored": "/srv/factory-artifacts/t_61fa2737/video-3/video/segment-c/assets/segment-c.mp4"
-    },
-    {
-      "attachable": true,
-      "path": "video/segment-c/renders/segment-c.mp4",
-      "sha256": "0bf35a0b9aeb9a60d90483ee143a75f2ca55c4bcd1499edc444d1577d310ad83",
-      "size": 1860410,
-      "stored": "/srv/factory-artifacts/t_61fa2737/video-3/video/segment-c/renders/segment-c.mp4"
-    }
-  ],
+  "artifacts": [],
   "base_ref": "HEAD",
   "base_sha": "c67e84814f84aef441d624115e847f0646c9ddb6",
   "binary": "/home/dev-runner/.local/bin/claude",
