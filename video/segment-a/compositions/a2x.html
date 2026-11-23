@@ -4,6 +4,31 @@
       position: absolute;
       inset: 0;
     }
+    .chip {
+      position: absolute;
+      top: 252px;
+      right: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: rgba(10, 12, 17, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      font-family: "Inter", sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+    .chip .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+    }
     .cover {
       /* Neutral bar over the log viewer's source-URL header row. The URL
          (http://airflow-worker:8793/log?... ) lazy-renders into frame at ~18.7 s
@@ -40,6 +65,11 @@
     }
   </style>
   <div id="root" data-composition-id="a2x" data-width="1920" data-height="1080">
+    <!-- Title chip across the full A2 shot (local 0-9.967 s = global 15-24.967 s).
+         Constant on screen, no fade-out: the video ends while it is still up. -->
+    <div id="chip-a2" class="clip" data-start="0" data-duration="9.967" data-track-index="3">
+      <div class="chip"><span class="dot"></span>A2 · Upload in MinIO</div>
+    </div>
     <!-- Local 3.55-5.0 s = global 18.55-20.0 s: cover while the URL row is on screen. -->
     <div id="cover-hostname" class="clip" data-start="3.55" data-duration="1.45" data-track-index="2">
       <div class="cover" style="left: 660px; top: 341px; width: 1240px; height: 21px;"></div>
@@ -55,6 +85,7 @@
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#chip-a2 .chip", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 0.1);
     tl.fromTo("#cover-hostname .cover", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power1.out" }, 3.57);
     tl.to("#cover-hostname .cover", { opacity: 0, duration: 0.12, ease: "power1.in" }, 4.85);
     tl.fromTo("#co-a2-folders .co-box", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 5.2);
