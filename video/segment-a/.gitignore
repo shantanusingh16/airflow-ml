@@ -1,0 +1,8 @@
+# renders never enter git (delivery MP4 is a factory artifact, not source)
+renders/
+# frame extraction + vision analysis working files
+frames/
+# hyperframes local build/cache dir
+.hyperframes/
+# base QA clip: factory artifact, stays in tree (too large for git)
+assets/

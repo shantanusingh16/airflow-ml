@@ -1,0 +1,66 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+    }
+    .cover {
+      /* Neutral bar over the log viewer's source-URL header row. The URL
+         (http://airflow-worker:8793/log?... ) lazy-renders into frame at ~18.7 s
+         (text y≈345-360, underline y≈357, x≈726-1669). The bar covers only that
+         URL row so no internal hostname is legible; the label row above (ends y≈339)
+         and the first log line below (starts y≈363) stay visible. Overlay only —
+         the captured frame is never cropped. */
+      position: absolute;
+      background: #0b0e13;
+      border-top: 1px solid #1c2230;
+      border-bottom: 1px solid #1c2230;
+    }
+    .co-box {
+      position: absolute;
+      border: 2px solid #ffb224;
+      border-radius: 6px;
+      background: rgba(255, 178, 36, 0.05);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.22);
+    }
+    .co-label {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 13px;
+      border-radius: 7px;
+      white-space: nowrap;
+      background: rgba(11, 13, 18, 0.94);
+      border: 1px solid #ffb224;
+      font-family: "Inter", sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #ffd47e;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+  <div id="root" data-composition-id="a2x" data-width="1920" data-height="1080">
+    <!-- Local 3.55-5.0 s = global 18.55-20.0 s: cover while the URL row is on screen. -->
+    <div id="cover-hostname" class="clip" data-start="3.55" data-duration="1.45" data-track-index="2">
+      <div class="cover" style="left: 660px; top: 341px; width: 1240px; height: 21px;"></div>
+    </div>
+    <!-- Local 5-9.967 s = global 20-24.967 s: MinIO console folder rows under
+         datasets/voc12/VOC2012/ (rows y≈322-440, name column x≈430-900, size "-" x≈910-1000).
+         The left panel totals (2734 Objects / 113.8 MiB) are whole-bucket figures —
+         deliberately not captioned or called out. -->
+    <div id="co-a2-folders" class="clip" data-start="5" data-duration="4.967" data-track-index="2">
+      <div class="co-box" style="left: 425px; top: 315px; width: 635px; height: 135px;"></div>
+      <div class="co-label" style="left: 430px; top: 456px;">Annotations · ImageSets · JPEGImages</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#cover-hostname .cover", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "power1.out" }, 3.57);
+    tl.to("#cover-hostname .cover", { opacity: 0, duration: 0.12, ease: "power1.in" }, 4.85);
+    tl.fromTo("#co-a2-folders .co-box", { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 5.2);
+    tl.fromTo("#co-a2-folders .co-label", { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 5.28);
+    tl.to("#co-a2-folders .co-box", { opacity: 0, duration: 0.18, ease: "power2.in" }, 9.78);
+    tl.to("#co-a2-folders .co-label", { opacity: 0, duration: 0.16, ease: "power2.in" }, 9.78);
+    window.__timelines["a2x"] = tl;
+  </script>
+</template>
