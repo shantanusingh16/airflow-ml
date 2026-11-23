@@ -1,0 +1,48 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .chip {
+      position: absolute; right: 150px; top: 68px; height: 38px; padding: 0 16px;
+      display: flex; align-items: center; gap: 10px; border-radius: 19px;
+      background: rgba(17, 24, 39, 0.92); color: #fff; font-size: 19px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .chip i { width: 8px; height: 8px; border-radius: 4px; background: #d6336c; display: block; }
+    .co { position: absolute; inset: 0; }
+    .co .box { position: absolute; border: 2px solid #d6336c; border-radius: 3px; }
+    .co .ln { position: absolute; background: #d6336c; }
+    .co .lbl {
+      position: absolute; height: 30px; padding: 0 12px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 18px; font-weight: 700; white-space: nowrap;
+    }
+  </style>
+  <div id="root" data-composition-id="b1" data-width="1920" data-height="1080">
+    <div id="b1-chip" class="clip" data-start="0" data-duration="9.1" data-track-index="0">
+      <div class="chip"><i></i><span data-var-text="b1Chip">B1 · Verify</span></div>
+    </div>
+
+    <!-- Callout: the already-green verify_upload cell (badge x 407–420, y 276–289; upload_voc12 cell ends
+         y 270, tooltip arrow starts y 294 during 1.0–4.2 s). Box borders sit in the empty gaps (y 272–273,
+         290–291; x 397–398, 424–425). Pointer runs x 397 (left of the cells / run bar at x 405+) up to a
+         label in the empty left-panel area (x ≤ 334, y 212–240). Static: no state-change animation.
+         Out before the hard cut at 7.567 s. -->
+    <div id="b1-co-cell" class="clip" data-start="0.5" data-duration="7.0" data-track-index="1">
+      <div class="co" id="b1-co">
+        <div class="box" style="left:397px; top:272px; width:29px; height:20px"></div>
+        <div class="ln" style="left:397px; top:226px; width:2px; height:47px"></div>
+        <div class="ln b1-ptr" style="left:334px; top:226px; width:65px; height:2px; transform-origin:100% 50%"></div>
+        <div class="lbl" style="right:1586px; top:211px">verify_upload · success</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#b1-chip .chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.1);
+    tl.fromTo("#b1-co", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.5);
+    tl.fromTo("#b1-co .b1-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.5);
+    tl.to("#b1-co", { opacity: 0, duration: 0.25, ease: "power2.in" }, 7.2);
+    tl.to("#b1-chip .chip", { opacity: 0, duration: 0.2, ease: "power2.in" }, 8.85);
+    window.__timelines["b1"] = tl;
+  </script>
+</template>

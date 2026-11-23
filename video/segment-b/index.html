@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <!-- Segment B (voc12_demo, VERIFY + INGEST): overlays only, composited over the untouched QA clip.
+         Numbers: observed.json only — images_verified=1000 (B2 caption), images_ingested=1000 (B3 caption).
+         Silent: the clip has no audio track and stays muted; no <audio> elements. -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      #base { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: contain; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30.066667"
+         data-width="1920" data-height="1080">
+      <!-- Base: segment-b.mp4 (sha256 9b97cdc4…b832), full length 902 frames, 1:1, no trim / rate change / crop. -->
+      <video id="base" class="clip" src="assets/segment-b.mp4" muted playsinline
+             data-start="0" data-duration="30.066667" data-track-index="0" style="z-index:1"></video>
+
+      <!-- B1: 0 → 9.1 s (grid hold 0–7.567, hard cut 7.567, log loading 7.6–9.1) -->
+      <div id="b1" data-composition-id="b1" data-composition-src="compositions/b1.html"
+           data-start="0" data-duration="9.1" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:2"></div>
+
+      <!-- B2: 9.1 → 17.6 s (verify_upload log, static 9.133–17.6) -->
+      <div id="b2" data-composition-id="b2" data-composition-src="compositions/b2.html"
+           data-start="9.1" data-duration="8.5" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:3"></div>
+
+      <!-- B3: 17.6 → end (B3a grid 17.6–22.867, transition, B3b ingest log static 24.367–30.067) -->
+      <div id="b3" data-composition-id="b3" data-composition-src="compositions/b3.html"
+           data-start="17.6" data-duration="12.466667" data-track-index="1" data-track-kind="graphics"
+           data-width="1920" data-height="1080" style="z-index:4"></div>
+
+      <!-- Caption bar, always on: one host holds all three caption groups -->
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html"
+           data-start="0" data-duration="30.066667" data-track-index="2" data-track-kind="captions"
+           data-width="1920" data-height="1080" style="z-index:5"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

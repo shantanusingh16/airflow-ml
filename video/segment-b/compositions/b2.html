@@ -1,0 +1,47 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .chip {
+      position: absolute; right: 150px; top: 68px; height: 38px; padding: 0 16px;
+      display: flex; align-items: center; gap: 10px; border-radius: 19px;
+      background: rgba(17, 24, 39, 0.92); color: #fff; font-size: 19px; font-weight: 700;
+      letter-spacing: 0.01em; white-space: nowrap;
+    }
+    .chip i { width: 8px; height: 8px; border-radius: 4px; background: #d6336c; display: block; }
+    .co { position: absolute; inset: 0; }
+    .co .box { position: absolute; border: 2px solid #d6336c; border-radius: 3px; }
+    .co .ln { position: absolute; background: #d6336c; }
+    .co .lbl {
+      position: absolute; height: 30px; padding: 0 12px; display: flex; align-items: center;
+      background: #fff; border: 2px solid #d6336c; border-radius: 6px; color: #a61e4d;
+      font-size: 18px; font-weight: 700; white-space: nowrap;
+    }
+  </style>
+  <div id="root" data-composition-id="b2" data-width="1920" data-height="1080">
+    <div id="b2-chip" class="clip" data-start="0" data-duration="8.5" data-track-index="0">
+      <div class="chip"><i></i><span data-var-text="b2Chip">B2 · Verify log</span></div>
+    </div>
+
+    <!-- Callout: verify_upload log L11–L13 (static hold 9.133–17.6 s abs). Glyph rows: L10 543–554,
+         L11 561–572, L12 579–590, L13 597–608 (text ends x 1419), Post Execute 613–624 (x 483–586).
+         Line numbers start x 499. Box borders run only through the empty gaps: top y 557–558,
+         bottom 609–610, left x 493–494, right 1428–1429. Label right of the box (x ≥ 1460, y 569–597),
+         where L11–L13 have no text. Pointer (cursor) is off-frame in B2 — not called out. -->
+    <div id="b2-co-lines" class="clip" data-start="0.3" data-duration="8.05" data-track-index="1">
+      <div class="co" id="b2-co">
+        <div class="box" style="left:493px; top:557px; width:937px; height:54px"></div>
+        <div class="ln b2-ptr" style="left:1430px; top:583px; width:30px; height:2px; transform-origin:0 50%"></div>
+        <div class="lbl" style="left:1460px; top:568px">verify_upload counts</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#b2-chip .chip", { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.05);
+    tl.fromTo("#b2-co", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
+    tl.fromTo("#b2-co .b2-ptr", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.out" }, 0.4);
+    tl.to("#b2-co", { opacity: 0, duration: 0.25, ease: "power2.in" }, 8.05);
+    tl.to("#b2-chip .chip", { opacity: 0, duration: 0.2, ease: "power2.in" }, 8.25);
+    window.__timelines["b2"] = tl;
+  </script>
+</template>
