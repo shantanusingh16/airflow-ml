@@ -1,0 +1,44 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }
+    .cap {
+      position: absolute; padding: 12px 26px 14px; border-radius: 12px;
+      background: rgba(17, 24, 39, 0.92); color: #fff; white-space: nowrap;
+    }
+    .cap .l1 { font-size: 30px; font-weight: 700; line-height: 38px; }
+    .cap .p1 { font-size: 28px; font-weight: 400; line-height: 36px; color: #ced4da; }
+    .cap .p2 { font-size: 28px; font-weight: 700; line-height: 36px; }
+    /* Positions chosen per shot over empty UI area at the bottom of the frame (measured from source frames):
+       C1: left Grid panel below the task list (x 76–436 empty from y ~360) — a centred bar would cover log lines 46–55.
+       C2: object list body (x 300–1570, y 330–1020 empty; Object Info panel starts x 1590).
+       C3: white dialog margin left of the report pages (x 72–700; pages occupy x ~705–1210). */
+    #cap-c1 .cap { left: 92px; top: 972px; }
+    #cap-c2 .cap { left: 340px; top: 908px; }
+    #cap-c3 .cap { left: 84px; top: 972px; }
+    #cap-c3 .cap .l1 { font-size: 27px; }
+  </style>
+  <div id="root" data-composition-id="captions" data-width="1920" data-height="1080">
+    <!-- C1 copy (v2): {n_dup_groups} = dup_groups.value = 1 → singular. -->
+    <div id="cap-c1" class="clip" data-start="0" data-duration="9.8" data-track-index="0">
+      <div class="cap"><div class="l1" data-var-text="capC1">1 near-dup group</div></div>
+    </div>
+    <!-- C2 copy (v2): analysis/{run_id}/voc12_embed_report.pdf, {run_id} = run_id.value; two lines. -->
+    <div id="cap-c2" class="clip" data-start="9.8" data-duration="8.733333" data-track-index="0">
+      <div class="cap">
+        <div class="p1" data-var-text="capC2L1">analysis/</div>
+        <div class="p2" data-var-text="capC2L2">manual__2026-11-23T01:00:57.988475+00:00/voc12_embed_report.pdf</div>
+      </div>
+    </div>
+    <!-- C3 copy (v2): no placeholders. -->
+    <div id="cap-c3" class="clip" data-start="18.533333" data-duration="9.166667" data-track-index="0">
+      <div class="cap"><div class="l1" data-var-text="capC3">voc12_embed_report.pdf · dup groups</div></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#cap-c1 .cap", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 0);
+    tl.fromTo("#cap-c2 .cap", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 9.8);
+    tl.fromTo("#cap-c3 .cap", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 18.533333);
+    window.__timelines["captions"] = tl;
+  </script>
+</template>

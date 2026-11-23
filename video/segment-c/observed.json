@@ -1,0 +1,40 @@
+{
+  "window": "capture-4",
+  "segment": "C (DEDUPLICATE)",
+  "clip": "out/segment-c.mp4 (27.70 s, 1920x1080, 30 fps, H.264, no audio)",
+  "shots": {
+    "C1a": "0.00-3.53 s  Airflow run page /dags/voc12_demo/runs/<run_id> with Grid panel (left) -> click on the embed_fastdup grid cell",
+    "C1b": "3.53-9.80 s  embed_fastdup task page, Logs tab, scrolled to bottom before the take (static hold)",
+    "C2":  "9.80-18.53 s MinIO console ml-artifacts/analysis/<run_id>/ -> click object row -> Object Info panel -> click Actions > Preview",
+    "C3":  "18.53-27.70 s PDF preview at top (pages 1-2), one smooth wheel scroll (~21.1-23.3 s) to page 3, hold 23.3-27.7 s"
+  },
+  "dag_id": { "value": "voc12_demo", "where": "C1a+C1b breadcrumb 'Dag voc12_demo' (top-left)" },
+  "run_id": { "value": "manual__2026-11-23T01:00:57.988475+00:00", "where": "C1a run header title + breadcrumb; C1b breadcrumb 'Dag Run'; C2 breadcrumb; C3 preview dialog title" },
+  "run_state": { "value": "Success", "where": "C1a green badge next to the run id in the run header" },
+  "run_duration": { "value": "00:17:02", "where": "C1a run header 'Duration'; also Grid duration axis label (00:17:02)" },
+  "grid_task_states": {
+    "value": ["success", "success", "success", "success", "success"],
+    "tasks": ["upload_voc12", "verify_upload", "ingest_voc12", "embed_fastdup", "cluster_split"],
+    "where": "C1a Grid panel (left, x~413, y 263-343): 5 green check badges in the run column (DOM data-testid grid-<run_id>-<task>, task-state-badge; frame pixel RGB ~(0-9,106-115,3-12)); same screen: Task Instances table shows 'Success' for all 5 tasks",
+    "note": "Grid RENDERED in this window (0 WebSocket connections, but grid data loaded) - Runs-table fallback NOT used"
+  },
+  "fastdup_version": { "value": "2.54", "where": "C1b log line 19 'fastdup 2.54 over 1000 images ...'" },
+  "images_embedded": { "value": 1000, "where": "C1b log line 39 'Dataset contains 1000 images' and line 54 'EMBED OK: 1000 images, ...'" },
+  "outliers": { "value": 69, "where": "C1b log line 41 'Outliers: 6.90% (69) of images are possible outliers ...'" },
+  "outliers_pct": { "value": "6.90%", "where": "C1b log line 41" },
+  "embedding_dim": { "value": 576, "where": "C1b log line 48 'fastdup embeddings done in 1s (dim=576)' (also line 51 'dinov2_embedding (576-dim)')" },
+  "dup_groups": { "value": 1, "where": "C1b log line 54 'EMBED OK: 1000 images, 1 dup groups; manifest data/<run_id>/voc12_embed_manifest.json'; C3 page 3 title 'Duplicate groups (1) — top 20 by size' (canvas-rendered)" },
+  "pdf_report_key": { "value": "s3://ml-artifacts/analysis/manual__2026-11-23T01:00:57.988475+00:00/voc12_embed_report.pdf", "where": "C1b log line 53 'PDF report published: ...'" },
+  "report_prefix": { "value": "analysis/manual__2026-11-23T01:00:57.988475+00:00", "where": "C2 breadcrumb 'ml-artifacts / analysis / manual__2026-11-23T01:00:57.988475+00:00'; C3 dialog title" },
+  "report_object_name": { "value": "voc12_embed_report.pdf", "where": "C2 object row + Object Info 'Name'" },
+  "report_size": { "value": "74.0 KiB", "where": "C2 object row 'Size' column + Object Info 'Size'" },
+  "report_last_modified": { "value": "Today, 01:14", "where": "C2 object row 'Last Modified' (Object Info panel shows '14 hours ago')" },
+  "report_etag": { "value": "6f152d0513c33dadb17ac3dfed760001", "where": "C2 Object Info 'ETAG'" },
+  "report_page3": {
+    "value": "Duplicate groups (1) — top 20 by size / group 828: 2 images",
+    "where": "C3 hold 23.3-27.7 s: page 3 canvas at y 120-696 of the frame (pages 1-2 above, page 4 histograms below; dialog scrollTop 907)",
+    "note": "Page 3 is text-only (title + group list) - per dags/jobs/embed_voc12.py; no thumbnails are drawn on it and the 'most similar pair' image page is not present in this PDF (4 pages). No VOC images appear anywhere in the clip."
+  },
+  "reference_only_not_dataset_counts": { "value": "113.8 MiB - 2734 Objects", "where": "C2 MinIO bucket header (bucket totals; never caption as dataset counts)" },
+  "internal_hostname_in_frame": { "value": false, "where": "C1b: log source-URL line (airflow-worker:8793) is line 1, scrolled out of frame (visible lines 16-55); checked before and after the hold" }
+}
