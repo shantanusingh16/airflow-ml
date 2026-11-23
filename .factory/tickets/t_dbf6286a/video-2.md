@@ -269,29 +269,7 @@ bff3008c40adcd14db6b9714fd981872261b3ff7928e8e336340daa5b05a1f25  renders/segmen
 ```json
 {
   "argv0": "/home/dev-runner/.local/bin/claude",
-  "artifacts": [
-    {
-      "attachable": true,
-      "path": "video/segment-b/assets/segment-b.mp4",
-      "sha256": "9b97cdc42c8cf24b38bdd9763d3ff273208f3e27371c89b558d78e869374b832",
-      "size": 1077128,
-      "stored": "/srv/factory-artifacts/t_dbf6286a/video-2/video/segment-b/assets/segment-b.mp4"
-    },
-    {
-      "attachable": true,
-      "path": "video/segment-b/renders/preview.mp4",
-      "sha256": "5daaf08b4624a416ec6c07a809945d4a29866dbbf7b50dae7e4e834f159382ed",
-      "size": 1267251,
-      "stored": "/srv/factory-artifacts/t_dbf6286a/video-2/video/segment-b/renders/preview.mp4"
-    },
-    {
-      "attachable": true,
-      "path": "video/segment-b/renders/segment-b.mp4",
-      "sha256": "bff3008c40adcd14db6b9714fd981872261b3ff7928e8e336340daa5b05a1f25",
-      "size": 2275189,
-      "stored": "/srv/factory-artifacts/t_dbf6286a/video-2/video/segment-b/renders/segment-b.mp4"
-    }
-  ],
+  "artifacts": [],
   "base_ref": "HEAD",
   "base_sha": "c67e84814f84aef441d624115e847f0646c9ddb6",
   "binary": "/home/dev-runner/.local/bin/claude",
