@@ -155,22 +155,7 @@ sha256(/inputs/artifacts/t_cc35d411/capture-2/out/segment-a.mp4) = 8e94e88a…ec
 ```json
 {
   "argv0": "/home/dev-runner/.local/bin/omp",
-  "artifacts": [
-    {
-      "attachable": true,
-      "path": "video/segment-a/assets/segment-a.mp4",
-      "sha256": "8e94e88aa489949c671175e0c979b173b0215ce71eebc2b9fa51635a35b6ec3f",
-      "size": 1065126,
-      "stored": "/srv/factory-artifacts/t_e687db28/video-2/video/segment-a/assets/segment-a.mp4"
-    },
-    {
-      "attachable": true,
-      "path": "video/segment-a/renders/segment-a.mp4",
-      "sha256": "dfddde5d453822e48e2aaa28f6e5d94c119cf7468a94b8c14f1e9ed9b2648db4",
-      "size": 2570887,
-      "stored": "/srv/factory-artifacts/t_e687db28/video-2/video/segment-a/renders/segment-a.mp4"
-    }
-  ],
+  "artifacts": [],
   "base_ref": "factory/t_e687db28/video-1",
   "base_sha": "c64b08376e9cdf0d62215af0091a985cc449e651",
   "binary": "/home/dev-runner/.local/bin/omp",
