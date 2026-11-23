@@ -1,0 +1,50 @@
+<template>
+  <style>
+    #root {
+      position: absolute; inset: 0; overflow: hidden; font-family: Inter, sans-serif; color: #fff;
+      background: radial-gradient(1200px 700px at 50% 42%, #16213a 0%, #0b1120 70%);
+    }
+    #root .grid {
+      position: absolute; inset: -40px;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+    #root .stack {
+      position: absolute; left: 0; right: 0; top: 330px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    #root .wordmark {
+      display: flex; align-items: center; gap: 36px;
+      font-size: 168px; font-weight: 900; letter-spacing: -0.03em; line-height: 190px;
+    }
+    #root .wordmark i { width: 34px; height: 34px; border-radius: 17px; background: #22d3ee; display: block; }
+    #root .rule { width: 520px; height: 4px; margin-top: 34px; border-radius: 2px; background: #22d3ee; transform-origin: 50% 50%; }
+    #root .value {
+      margin-top: 52px; font-size: 44px; font-weight: 400; line-height: 56px; color: #dee2e6; white-space: nowrap;
+    }
+  </style>
+  <div id="root" data-composition-id="title" data-width="1920" data-height="1080">
+    <div id="t-bg" class="clip" data-start="0" data-duration="10" data-track-index="0">
+      <div class="grid"></div>
+    </div>
+    <div id="t-copy" class="clip" data-start="0" data-duration="10" data-track-index="1">
+      <div class="stack">
+        <div class="wordmark"><i></i><span data-var-text="title">airflow-ml</span></div>
+        <div class="rule"></div>
+        <div class="value" data-var-text="value">From raw dataset to duplicate-checked, split-ready data — one platform.</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#t-bg .grid", { opacity: 1, y: 0 }, { opacity: 1, y: 40, duration: 10, ease: "none" }, 0);
+    tl.fromTo("#t-copy .wordmark", { opacity: 1, scale: 0.97 }, { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" }, 0);
+    tl.fromTo("#t-copy .wordmark i", { scale: 0.6 }, { scale: 1, duration: 0.6, ease: "back.out(2)" }, 0.2);
+    tl.fromTo("#t-copy .rule", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power2.inOut" }, 1.0);
+    tl.fromTo("#t-copy .value", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.9, ease: "power2.out" }, 1.6);
+    tl.to("#t-copy .stack", { scale: 1.02, duration: 7.4, ease: "none" }, 2.5);
+    window.__timelines["title"] = tl;
+  </script>
+</template>
